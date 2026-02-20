@@ -1,0 +1,56 @@
+replicaCount: 1
+
+image:
+  repository: ghcr.io/nathaelb/bonnal.cloud
+  pullPolicy: IfNotPresent
+  tag: "ddf58dd"
+
+imagePullSecrets: []
+
+nameOverride: ""
+fullnameOverride: "bonnal-cloud"
+
+serviceAccount:
+  create: false
+
+podAnnotations: {}
+podLabels: {}
+
+podSecurityContext: {}
+
+securityContext:
+  runAsNonRoot: true
+  runAsUser: 1000
+  allowPrivilegeEscalation: false
+  readOnlyRootFilesystem: true
+
+service:
+  type: ClusterIP
+  port: 80
+  targetPort: 8080
+
+ingress:
+  enabled: true
+  className: traefik
+  clusterIssuer: letsencrypt-prod
+  hosts:
+    - host: bonnal.cloud
+      paths:
+        - path: /
+          pathType: Prefix
+  annotations: {}
+
+resources:
+  requests:
+    cpu: 50m
+    memory: 64Mi
+  limits:
+    cpu: 200m
+    memory: 128Mi
+
+autoscaling:
+  enabled: false
+
+nodeSelector: {}
+tolerations: []
+affinity: {}
