@@ -1,0 +1,128 @@
+---
+/**
+ * "Leading Open Systems / Execution" section.
+ *
+ * Three-column card layout on desktop, stacked on mobile.
+ * Each card: title, description, small tag list.
+ * No borders — lighter visual weight than the Architecture section.
+ */
+
+interface PillarCard {
+  title: string;
+  description: string;
+  tags: string[];
+}
+
+const pillars: PillarCard[] = [
+  {
+    title: "Project Ownership",
+    description:
+      "Owning technical direction from architecture design to production reliability, with clear accountability at each stage.",
+    tags: ["Roadmaps", "standards", "operational discipline"],
+  },
+  {
+    title: "Community Contributions",
+    description:
+      "Contributing reusable patterns, tooling improvements, and engineering notes that help other teams ship safely.",
+    tags: ["Mentorship", "reviews", "knowledge transfer"],
+  },
+  {
+    title: "System Evolution",
+    description:
+      "Evolving live systems through controlled migrations, observability-first decisions, and explicit tradeoff management.",
+    tags: ["Refactoring strategy", "migration plans", "observability"],
+  },
+];
+---
+
+<section
+  id="leading-open-systems"
+  class="los section"
+  aria-labelledby="los-heading"
+>
+  <div class="container">
+    <h2 id="los-heading" class="section-heading" data-animate>
+      Leading Open Systems / Execution
+    </h2>
+
+    <div class="los__grid" role="list" data-animate-children>
+      {
+        pillars.map((pillar) => (
+          <article class="los__card" role="listitem">
+            <h3 class="los__card-title">{pillar.title}</h3>
+            <p class="los__card-desc">{pillar.description}</p>
+            <ul class="los__tags" aria-label={`${pillar.title} keywords`}>
+              {pillar.tags.map((tag) => (
+                <li>{tag}</li>
+              ))}
+            </ul>
+          </article>
+        ))
+      }
+    </div>
+  </div>
+</section>
+
+<style>
+  .los {
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .section-heading {
+    font-size: clamp(1.25rem, 4vw, 1.875rem);
+    font-weight: 700;
+    color: var(--color-ink-primary);
+    margin-bottom: 2rem;
+  }
+
+  .los__grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+
+  @media (min-width: 640px) {
+    .los__grid {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+
+  .los__card {
+    /* Borderless — lighter than architecture cards */
+    padding: 0;
+  }
+
+  .los__card-title {
+    font-size: var(--font-size-md);
+    font-weight: 700;
+    color: var(--color-ink-primary);
+    margin-bottom: 0.625rem;
+  }
+
+  .los__card-desc {
+    font-size: var(--font-size-sm);
+    line-height: var(--line-height-relaxed);
+    color: var(--color-ink-secondary);
+    margin-bottom: 0.75rem;
+  }
+
+  .los__tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0 0.375rem;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .los__tags li {
+    font-size: var(--font-size-xs);
+    color: var(--color-ink-muted);
+  }
+
+  .los__tags li + li::before {
+    content: "·";
+    margin-right: 0.375rem;
+    color: var(--color-ink-muted);
+  }
+</style>

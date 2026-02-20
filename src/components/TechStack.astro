@@ -1,0 +1,143 @@
+---
+/**
+ * Tech Stack section — logos with labels.
+ *
+ * Logos importés depuis src/assets/ via astro:assets (optimisés à la build).
+ * Rendu : grisé par défaut, couleur au hover.
+ * Grille : 5 logos centrés sur une ligne sur desktop, wrap sur mobile.
+ */
+import { Image } from "astro:assets";
+
+import kubernetesLogo from "@assets/logos/kubernetes.svg";
+import rustLogo from "@assets/logos/rust.svg";
+import ferriskeyLogo from "@assets/logos/ferriskey.png";
+import keycloakLogo from "@assets/logos/keycloak.svg";
+import opaLogo from "@assets/logos/opa.svg";
+import prometheusLogo from "@assets/logos/prometheus.svg";
+import grafanaLogo from "@assets/logos/grafana.svg";
+import postgresLogo from "@assets/logos/postgres.svg";
+import scylladbLogo from "@assets/logos/scylladb.svg";
+import kafkaLogo from "@assets/logos/kafka.svg";
+import rabbitmqLogo from "@assets/logos/rabbitmq.svg";
+
+interface Tech {
+  name: string;
+  src: ImageMetadata;
+  /** Logo sombre sur fond clair — on inverse en mode grisé pour la lisibilité */
+  invert?: boolean;
+}
+
+const techs: Tech[] = [
+  { name: "Kubernetes", src: kubernetesLogo },
+  { name: "Rust",       src: rustLogo, invert: true },
+  { name: "FerrisKey",  src: ferriskeyLogo },
+  { name: "Keycloak",   src: keycloakLogo, invert: true },
+  { name: "OPA",        src: opaLogo },
+  { name: "Prometheus", src: prometheusLogo },
+  { name: "Grafana",    src: grafanaLogo },
+  { name: "PostgreSQL", src: postgresLogo,  invert: true },
+  { name: "ScyllaDB",   src: scylladbLogo,  invert: true },
+  { name: "Kafka",      src: kafkaLogo,     invert: true },
+  { name: "RabbitMQ",   src: rabbitmqLogo,  invert: true },
+];
+---
+
+<section id="tech-stack" class="ts section" aria-labelledby="ts-heading">
+  <div class="container">
+    <h2 id="ts-heading" class="ts__heading" data-animate>Tech Stack</h2>
+
+    <ul class="ts__grid" data-animate-children aria-label="Technologies utilisées">
+      {
+        techs.map((tech) => (
+          <li class={`ts__item${tech.invert ? " ts__item--invert" : ""}`}>
+            <Image
+              src={tech.src}
+              alt={tech.name}
+              width={48}
+              height={48}
+              class="ts__logo"
+              loading="lazy"
+            />
+            <span class="ts__name">{tech.name}</span>
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+</section>
+
+<style>
+  .ts {
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .ts__heading {
+    font-size: clamp(1.5rem, 4vw, 2rem);
+    font-weight: 700;
+    color: var(--color-ink-primary);
+    margin-bottom: 2.5rem;
+  }
+
+  /* ── Grille de logos ── */
+  .ts__grid {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2rem 3rem;
+    align-items: center;
+  }
+
+  @media (min-width: 768px) {
+    .ts__grid {
+      gap: 2.5rem 4rem;
+    }
+  }
+
+  /* ── Chaque item: logo + label empilés ── */
+  .ts__item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.625rem;
+    cursor: default;
+  }
+
+  /* ── Logo: grisé par défaut, transition vers couleur ── */
+  .ts__logo {
+    width: 2.75rem;
+    height: 2.75rem;
+    object-fit: contain;
+    /* Dessature le logo: on passe en niveaux de gris */
+    filter: grayscale(1) opacity(0.45);
+    transition: filter 0.2s ease;
+  }
+
+  /* Les logos clairs (Rust, Keycloak) ont besoin d'être inversés pour être visibles
+     sur fond clair en niveaux de gris */
+  .ts__item--invert .ts__logo {
+    filter: grayscale(1) opacity(0.5) invert(0.85);
+  }
+
+  .ts__item:hover .ts__logo {
+    filter: none;
+  }
+
+  .ts__item--invert:hover .ts__logo {
+    filter: none;
+  }
+
+  /* ── Label sous le logo ── */
+  .ts__name {
+    font-size: var(--font-size-xs);
+    font-weight: 500;
+    color: var(--color-ink-muted);
+    letter-spacing: 0.01em;
+    transition: color 0.2s ease;
+  }
+
+  .ts__item:hover .ts__name {
+    color: var(--color-ink-secondary);
+  }
+</style>

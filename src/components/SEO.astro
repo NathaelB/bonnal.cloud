@@ -1,0 +1,76 @@
+---
+/**
+ * SEO component — encapsulates all head metadata.
+ *
+ * Responsibilities:
+ * - Canonical URL
+ * - Meta title + description
+ * - OpenGraph tags
+ * - Twitter card
+ * - JSON-LD Person schema
+ * - Robots directive
+ */
+import type { SiteMeta } from "@lib/site";
+import { SITE } from "@lib/site";
+
+interface Props extends SiteMeta {}
+
+const {
+  title = SITE.title,
+  description = SITE.description,
+  ogImage = "/banner.png",
+  noindex = false,
+  canonical,
+} = Astro.props;
+
+const canonicalURL = canonical
+  ? new URL(canonical, SITE.url).href
+  : new URL(Astro.url.pathname, SITE.url).href;
+
+const ogImageAbsolute = ogImage.startsWith("http")
+  ? ogImage
+  : new URL(ogImage, SITE.url).href;
+
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "Person",
+  name: SITE.author,
+  jobTitle: SITE.jobTitle,
+  url: SITE.url,
+  sameAs: SITE.sameAs,
+  description: SITE.description,
+};
+---
+
+<!-- Primary -->
+<title>{title}</title>
+<meta name="description" content={description} />
+<link rel="canonical" href={canonicalURL} />
+{noindex && <meta name="robots" content="noindex,nofollow" />}
+{!noindex && <meta name="robots" content="index,follow" />}
+<meta name="author" content={SITE.author} />
+
+<!-- OpenGraph -->
+<meta property="og:type" content="website" />
+<meta property="og:url" content={canonicalURL} />
+<meta property="og:title" content={title} />
+<meta property="og:description" content={description} />
+<meta property="og:image" content={ogImageAbsolute} />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+<meta property="og:site_name" content={SITE.name} />
+<meta property="og:locale" content={SITE.locale} />
+
+<!-- Twitter card -->
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:site" content={SITE.twitterHandle} />
+<meta name="twitter:title" content={title} />
+<meta name="twitter:description" content={description} />
+<meta name="twitter:image" content={ogImageAbsolute} />
+
+<!-- JSON-LD structured data -->
+<script
+  is:inline
+  type="application/ld+json"
+  set:html={JSON.stringify(jsonLd)}
+/>

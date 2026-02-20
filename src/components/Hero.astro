@@ -1,0 +1,225 @@
+---
+/**
+ * Hero section — primary identity block.
+ *
+ * Desktop: two-column layout, text left / photo right.
+ * Mobile: stacked, content only (photo hidden).
+ */
+import { Image } from "astro:assets";
+import portrait from "@assets/personnal/nathael.jpg";
+import cloudIamLogo from "@assets/companies/cloud-iam.png";
+---
+
+<section class="hero section" aria-label="Introduction">
+  <div class="container">
+    <div class="hero__grid">
+      <!-- ── Left: Identity ── -->
+      <div class="hero__content">
+        <h1 class="hero__name hero-anim hero-anim--1">Nathael Bonnal</h1>
+
+        <p class="hero__role hero-anim hero-anim--2">
+          Software Engineer<br />
+          Building and leading distributed<br class="hero__role-break" />
+          systems.
+        </p>
+
+        <p class="hero__bio hero-anim hero-anim--3">
+          I design cloud-native architectures, lead open-source initiatives, and
+          work on identity systems at scale.
+        </p>
+
+        <ul class="hero__tags hero-anim hero-anim--4" aria-label="Specializations">
+          <li>Kubernetes-native</li>
+          <li>Control/Data Plane</li>
+          <li>Identity at scale</li>
+        </ul>
+
+        <div class="flex flex-col">
+
+            <a
+              href="https://cloud-iam.com"
+              class="hero__employer hero-anim hero-anim--5"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="Cloud IAM website"
+            >
+              <span class="hero__employer-label">Currently at</span>
+              <Image
+                src={cloudIamLogo}
+                alt="Cloud IAM"
+                width={160}
+                height={42}
+                class="hero__employer-logo"
+                loading="eager"
+              />
+            </a>
+
+            <a
+              href="#what-i-build"
+              class="hero__cta hero-anim hero-anim--6"
+              aria-label="Jump to projects section"
+            >
+              Explore systems architecture →
+            </a>
+
+        </div>
+
+
+      </div>
+
+      <!-- ── Right: Portrait ── -->
+      <div class="hero__visual hero-anim--visual">
+        <Image
+          src={portrait}
+          alt="Nathael B."
+          width={600}
+          height={700}
+          class="hero__portrait"
+          loading="eager"
+        />
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .hero {
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .hero__grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 2rem;
+    align-items: start;
+  }
+
+  @media (min-width: 768px) {
+    .hero__grid {
+      grid-template-columns: 1fr 1fr;
+      gap: 3rem;
+      align-items: center;
+    }
+  }
+
+  /* ── Name ── */
+  .hero__name {
+    font-size: clamp(2.5rem, 7vw, 3.5rem);
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    line-height: 1;
+    color: var(--color-ink-primary);
+    margin-bottom: 0.75rem;
+  }
+
+  /* ── Role subtitle ── */
+  .hero__role {
+    font-size: clamp(1rem, 2.5vw, 1.1875rem);
+    font-weight: 700;
+    line-height: 1.3;
+    color: var(--color-ink-primary);
+    margin-bottom: 1.25rem;
+  }
+
+  .hero__role-break {
+    display: none;
+  }
+
+  @media (min-width: 768px) {
+    .hero__role-break {
+      display: block;
+    }
+  }
+
+  /* ── Bio ── */
+  .hero__bio {
+    font-size: var(--font-size-base);
+    line-height: var(--line-height-relaxed);
+    color: var(--color-ink-secondary);
+    max-width: 38ch;
+    margin-bottom: 1.25rem;
+  }
+
+  /* ── Tags ── */
+  .hero__tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem 1.25rem;
+    list-style: none;
+    margin: 0 0 1.5rem;
+    padding: 0;
+  }
+
+  .hero__tags li {
+    font-size: var(--font-size-xs);
+    color: var(--color-ink-muted);
+    letter-spacing: 0.01em;
+  }
+
+  /* ── Employer badge ── */
+  .hero__employer {
+    display: inline-flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 0.625rem;
+    margin-bottom: 1.25rem;
+    text-decoration: none;
+    opacity: 0.7;
+    transition: opacity 0.15s ease;
+  }
+
+  .hero__employer:hover {
+    opacity: 1;
+  }
+
+  .hero__employer-label {
+    font-size: var(--font-size-xs);
+    color: var(--color-ink-muted);
+    font-weight: 500;
+    white-space: nowrap;
+  }
+
+  .hero__employer-logo {
+    height: 2.5rem;
+    width: auto;
+    display: block;
+  }
+
+  /* ── CTA link ── */
+  .hero__cta {
+    font-size: var(--font-size-sm);
+    font-weight: 600;
+    color: var(--color-accent-blue);
+    text-decoration: none;
+    transition: opacity 0.15s ease;
+  }
+
+  .hero__cta:hover {
+    opacity: 0.75;
+  }
+
+  /* ── Portrait ── */
+  .hero__visual {
+    width: 100%;
+    aspect-ratio: 5 / 6;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    background-color: var(--color-surface);
+    display: none;
+  }
+
+  @media (min-width: 768px) {
+    .hero__visual {
+      display: block;
+    }
+  }
+
+  .hero__portrait {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center top;
+    display: block;
+  }
+</style>

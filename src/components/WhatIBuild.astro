@@ -1,0 +1,283 @@
+---
+/**
+ * "What I Build" section.
+ *
+ * Layout:
+ * - Featured project card (FerrisKey) — full-width with left accent bar
+ * - Two secondary cards side-by-side (Global Trust Fabric, Event-Driven Core)
+ *
+ * Design faithfully recreated from Figma:
+ * - Featured card uses blue left border and contained dot accent
+ * - Secondary cards are plain bordered boxes
+ */
+import { Image } from "astro:assets";
+import ferriskeyLogo from "@assets/logos/ferriskey.png";
+
+interface Project {
+  name: string;
+  description: string;
+  tags: string[];
+  link?: string;
+  linkLabel?: string;
+  featured?: boolean;
+}
+
+const featured: Project = {
+  name: "FerrisKey",
+  description:
+    "FerrisKey is an open-source identity and access management system built in Rust, designed for cloud-native and distributed environments. It focuses on modern authentication, scalable architecture, and externalized authorization.",
+  tags: [
+    "distributed identity management",
+    "multi-tenant security domains",
+    "event-based reconciliation",
+    "kubernetes-native architecture",
+
+  ],
+  link: "#ferriskey",
+  linkLabel: "Read system notes →",
+  featured: true,
+};
+
+const secondary: Pick<Project, "name" | "description">[] = [
+  {
+    name: "IAM as a Service Architecture",
+    description:
+      "Design of a multi-tenant identity platform built around a control plane / data plane model, enabling scalable, cloud-native IAM deployments.",
+  },
+  {
+    name: "Externalized Authorization Engine",
+    description:
+      "Policy-driven access control using distributed PDP/PEP patterns, integrating modern standards and cloud-native enforcement strategies.",
+  },
+];
+
+const techStack = ["Rust", "Kubernetes", "IAM", "Operator"];
+---
+
+<section id="what-i-build" class="wib section" aria-labelledby="wib-heading">
+  <div class="container">
+    <h2 id="wib-heading" class="section-heading" data-animate>What I Build</h2>
+
+    <!-- Featured project -->
+    <article class="wib__featured" aria-label="FerrisKey — featured project" data-animate>
+      <div class="wib__featured-inner">
+        <div class="wib__featured-content">
+          <h3 class="wib__featured-name">{featured.name}</h3>
+          <p class="wib__featured-desc">{featured.description}</p>
+
+          <ul class="wib__tag-list wib__tag-list--small" aria-label="Architecture tags">
+            {featured.tags.map((tag) => <li>{tag}</li>)}
+          </ul>
+
+          <ul class="wib__stack" aria-label="Technology stack">
+            {techStack.map((tech) => <li>{tech}</li>)}
+          </ul>
+
+          {
+            featured.link && (
+              <a href={featured.link} class="wib__link">
+                {featured.linkLabel}
+              </a>
+            )
+          }
+        </div>
+
+        <!-- FerrisKey logo — decorative background element bottom-right -->
+        <Image
+          src={ferriskeyLogo}
+          alt=""
+          aria-hidden="true"
+          width={120}
+          height={130}
+          class="wib__bg-logo"
+          loading="eager"
+        />
+      </div>
+    </article>
+
+    <!-- Secondary projects -->
+    <div class="wib__grid" role="list" data-animate-children>
+      {
+        secondary.map((project) => (
+          <article class="wib__card" role="listitem">
+            <h3 class="wib__card-name">{project.name}</h3>
+            <p class="wib__card-desc">{project.description}</p>
+          </article>
+        ))
+      }
+    </div>
+  </div>
+</section>
+
+<style>
+  .wib {
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  /* ── Section heading ── */
+  .section-heading {
+    font-size: clamp(1.5rem, 4vw, 2rem);
+    font-weight: 700;
+    color: var(--color-ink-primary);
+    margin-bottom: 2rem;
+  }
+
+  /* ── Featured card ── */
+  .wib__featured {
+    border: 1px solid var(--color-border);
+    border-left: 3px solid var(--color-accent-blue);
+    background-color: var(--color-surface);
+    border-radius: var(--radius-card);
+    margin-bottom: 1.25rem;
+    overflow: hidden;
+  }
+
+  .wib__featured-inner {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding: 1.75rem 2rem;
+    gap: 2rem;
+    position: relative;
+    z-index: 1;
+  }
+
+  @media (max-width: 640px) {
+    .wib__featured-inner {
+      padding: 1.25rem;
+    }
+  }
+
+  .wib__featured-content {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .wib__featured-name {
+    font-size: var(--font-size-xl);
+    font-weight: 700;
+    color: var(--color-ink-primary);
+    margin-bottom: 0.625rem;
+  }
+
+  .wib__featured-desc {
+    font-size: var(--font-size-sm);
+    line-height: var(--line-height-relaxed);
+    color: var(--color-ink-secondary);
+    max-width: 54ch;
+    margin-bottom: 0.75rem;
+  }
+
+  /* ── Tag lists ── */
+  .wib__tag-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0 0.75rem;
+    list-style: none;
+    margin: 0 0 0.625rem;
+    padding: 0;
+  }
+
+  .wib__tag-list--small li {
+    font-size: var(--font-size-xs);
+    color: var(--color-ink-muted);
+    line-height: 1.6;
+  }
+
+  .wib__tag-list--small li + li::before {
+    content: "·";
+    margin-right: 0.75rem;
+    color: var(--color-ink-muted);
+  }
+
+  /* ── Tech stack pills ── */
+  .wib__stack {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.375rem 0.625rem;
+    list-style: none;
+    margin: 0 0 1rem;
+    padding: 0;
+  }
+
+  .wib__stack li {
+    font-size: var(--font-size-xs);
+    font-weight: 500;
+    color: var(--color-ink-muted);
+  }
+
+  .wib__stack li + li::before {
+    content: "·";
+    margin-right: 0.625rem;
+    color: var(--color-border);
+  }
+
+  /* ── Read link ── */
+  .wib__link {
+    font-size: var(--font-size-sm);
+    font-weight: 600;
+    color: var(--color-accent-blue);
+    transition: opacity 0.15s;
+  }
+
+  .wib__link:hover {
+    opacity: 0.75;
+  }
+
+  /* ── FerrisKey background logo — bottom-right of featured card ── */
+  .wib__featured {
+    position: relative;
+  }
+
+  .wib__bg-logo {
+    position: absolute;
+    bottom: -1.5rem;
+    right: 0.5rem;
+    width: 13rem;
+    height: auto;
+    opacity: 0.08;
+    transform: rotate(-15deg);
+    pointer-events: none;
+    user-select: none;
+  }
+
+  @media (max-width: 640px) {
+    .wib__bg-logo {
+      width: 8rem;
+      right: 0.25rem;
+    }
+  }
+
+  /* ── Secondary 2-column grid ── */
+  .wib__grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  @media (min-width: 640px) {
+    .wib__grid {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+
+  .wib__card {
+    border: 1px solid var(--color-border);
+    background-color: var(--color-surface);
+    border-radius: var(--radius-card);
+    padding: 1.5rem;
+  }
+
+  .wib__card-name {
+    font-size: var(--font-size-md);
+    font-weight: 700;
+    color: var(--color-ink-primary);
+    margin-bottom: 0.5rem;
+  }
+
+  .wib__card-desc {
+    font-size: var(--font-size-sm);
+    line-height: var(--line-height-relaxed);
+    color: var(--color-ink-secondary);
+  }
+</style>

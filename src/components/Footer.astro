@@ -1,0 +1,95 @@
+---
+/**
+ * Site footer.
+ *
+ * Minimal: name, tagline, and three external links.
+ * Matches Figma — centered, compact, clean.
+ */
+
+const links = [
+  { label: "GitHub", href: "https://github.com/nathaelb", rel: "noopener noreferrer" },
+  { label: "LinkedIn", href: "https://www.linkedin.com/in/nathael-bonnal", rel: "noopener noreferrer" },
+  { label: "Email", href: "mailto:pro.nathaelbonnal@gmail.com", rel: undefined },
+] as const;
+---
+
+<footer class="footer" role="contentinfo">
+  <div class="container">
+    <div class="footer__inner" data-animate>
+      <p class="footer__name">Nathael B.</p>
+      <p class="footer__tagline">Building infrastructure that scales with clarity.</p>
+
+      <nav class="footer__nav" aria-label="Social and contact links">
+        <ul>
+          {
+            links.map((link, i) => (
+              <li>
+                <a
+                  href={link.href}
+                  rel={link.rel}
+                  target={link.rel ? "_blank" : undefined}
+                  aria-label={link.rel ? `${link.label} (opens in new tab)` : link.label}
+                >
+                  {link.label}
+                </a>
+                {i < links.length - 1 && (
+                  <span class="footer__sep" aria-hidden="true"> </span>
+                )}
+              </li>
+            ))
+          }
+        </ul>
+      </nav>
+    </div>
+  </div>
+</footer>
+
+<style>
+  .footer {
+    padding-block: 3rem;
+  }
+
+  .footer__inner {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.375rem;
+    text-align: center;
+  }
+
+  .footer__name {
+    font-size: var(--font-size-base);
+    font-weight: 700;
+    color: var(--color-ink-primary);
+  }
+
+  .footer__tagline {
+    font-size: var(--font-size-sm);
+    color: var(--color-ink-secondary);
+    margin-bottom: 0.25rem;
+  }
+
+  .footer__nav ul {
+    display: flex;
+    gap: 1rem;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .footer__nav a {
+    font-size: var(--font-size-sm);
+    font-weight: 500;
+    color: var(--color-accent-blue);
+    text-decoration: none;
+    transition: opacity 0.15s;
+  }
+
+  .footer__nav a:hover {
+    opacity: 0.75;
+  }
+
+  .footer__sep {
+    display: none;
+  }
+</style>

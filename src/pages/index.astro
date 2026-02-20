@@ -1,0 +1,30 @@
+---
+/**
+ * Home page — bonnal.cloud
+ *
+ * Static, zero client-side JS.
+ * Section order mirrors Figma design.
+ */
+import Layout from "@layouts/Layout.astro";
+import Hero from "@components/Hero.astro";
+import WhatIBuild from "@components/WhatIBuild.astro";
+import TechStack from "@components/TechStack.astro";
+import ArchitecturalFocus from "@components/ArchitecturalFocus.astro";
+import LeadingOpenSystems from "@components/LeadingOpenSystems.astro";
+import Footer from "@components/Footer.astro";
+---
+
+<Layout
+  title="Nathael Bonnal. — Software Engineer · Distributed Systems"
+  description="Software engineer designing cloud-native architectures, leading open-source initiatives, and building identity systems at scale. Kubernetes-native, distributed systems, IAM."
+>
+  <main id="main-content">
+    <Hero />
+    <WhatIBuild />
+    <TechStack />
+    <ArchitecturalFocus />
+    <LeadingOpenSystems />
+  </main>
+
+  <Footer />
+</Layout>

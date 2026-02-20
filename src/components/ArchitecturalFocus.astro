@@ -1,0 +1,139 @@
+---
+/**
+ * Architectural Focus / Operating Principles section.
+ *
+ * 2×2 grid of focus cards on desktop, stacked on mobile.
+ * Each card: heading, description, colored tag list.
+ * Color accents on tag text match Figma (blue variants).
+ */
+
+interface FocusCard {
+  title: string;
+  description: string;
+  tags: string[];
+}
+
+const cards: FocusCard[] = [
+  {
+    title: "Distributed Systems",
+    description:
+      "Designing reliable systems around explicit consistency boundaries, deterministic failure handling, and predictable recovery paths.",
+    tags: ["Consistency", "Failure domains", "Recovery"],
+  },
+  {
+    title: "Identity & Access Management",
+    description:
+      "Composing trust models where identity, authorization, and auditability stay understandable under scale.",
+    tags: ["Federation", "Policy engines", "Workload identity"],
+  },
+  {
+    title: "Cloud Infrastructure",
+    description:
+      "Building cloud platform primitives that reduce operational drag while preserving velocity for product teams.",
+    tags: ["Kubernetes loops", "GitOps", "Rollout safety"],
+  },
+  {
+    title: "Event-Driven Architectures",
+    description:
+      "Using events as durable contracts so domains can evolve independently without central fragility.",
+    tags: ["Immutable streams", "Replayability", "Async orchestration"],
+  },
+];
+---
+
+<section
+  id="architectural-focus"
+  class="af section"
+  aria-labelledby="af-heading"
+>
+  <div class="container">
+    <h2 id="af-heading" class="section-heading" data-animate>
+      Architectural Focus / Operating Principles
+    </h2>
+
+    <div class="af__grid" role="list" data-animate-children>
+      {
+        cards.map((card) => (
+          <article class="af__card" role="listitem">
+            <h3 class="af__card-title">{card.title}</h3>
+            <p class="af__card-desc">{card.description}</p>
+            <ul class="af__tags" aria-label={`${card.title} tags`}>
+              {card.tags.map((tag) => (
+                <li>{tag}</li>
+              ))}
+            </ul>
+          </article>
+        ))
+      }
+    </div>
+  </div>
+</section>
+
+<style>
+  .af {
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .section-heading {
+    font-size: clamp(1.25rem, 4vw, 1.875rem);
+    font-weight: 700;
+    color: var(--color-ink-primary);
+    margin-bottom: 2rem;
+  }
+
+  .af__grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1.25rem;
+  }
+
+  @media (min-width: 640px) {
+    .af__grid {
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5rem;
+    }
+  }
+
+  .af__card {
+    border: 1px solid var(--color-border);
+    background-color: var(--color-surface);
+    border-radius: var(--radius-card);
+    padding: 1.75rem;
+  }
+
+  .af__card-title {
+    font-size: var(--font-size-md);
+    font-weight: 700;
+    color: var(--color-ink-primary);
+    margin-bottom: 1rem;
+  }
+
+  .af__card-desc {
+    font-size: var(--font-size-sm);
+    line-height: var(--line-height-relaxed);
+    color: var(--color-ink-secondary);
+    margin-bottom: 1.25rem;
+  }
+
+  /* ── Colored tag pills — match Figma accent blue ── */
+  .af__tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0 0.375rem;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .af__tags li {
+    font-size: var(--font-size-xs);
+    font-weight: 500;
+    color: var(--color-accent-blue);
+  }
+
+  .af__tags li + li::before {
+    content: "·";
+    margin-right: 0.375rem;
+    color: var(--color-accent-blue);
+  }
+</style>
