@@ -1,0 +1,265 @@
+---
+import { getCollection, render, type CollectionEntry } from "astro:content";
+import Layout from "@layouts/Layout.astro";
+
+export async function getStaticPaths() {
+  const posts = await getCollection("blog", ({ data }) => !data.draft);
+
+  return posts.map((post) => ({
+    params: { slug: post.slug },
+    props: { post },
+  }));
+}
+
+type Props = {
+  post: CollectionEntry<"blog">;
+};
+
+const { post } = Astro.props as Props;
+const { Content } = await render(post);
+
+const dateFormatter = new Intl.DateTimeFormat("en-US", {
+  dateStyle: "long",
+});
+---
+
+<Layout
+  title={`${post.data.title} — Nathael B.`}
+  description={post.data.description}
+  canonical={`/blog/${post.slug}/`}
+>
+  <main id="main-content" class="post-page">
+    <article class="post container section" data-animate>
+      <p class="post-back"><a href="/writing/">← Back to writing</a></p>
+
+      <header class="post-header">
+        <h1>{post.data.title}</h1>
+        <p class="post-description">{post.data.description}</p>
+
+        <div class="post-meta">
+          <time datetime={post.data.publishDate.toISOString()}>
+            Published {dateFormatter.format(post.data.publishDate)}
+          </time>
+          {post.data.updatedDate && (
+            <span>Updated {dateFormatter.format(post.data.updatedDate)}</span>
+          )}
+        </div>
+
+        {post.data.links.length > 0 && (
+          <ul class="post-links" aria-label="Article links">
+            {post.data.links.map((link) => (
+              <li>
+                <a
+                  href={link.href}
+                  target={link.href.startsWith("http") ? "_blank" : undefined}
+                  rel={link.href.startsWith("http") ? "noopener noreferrer" : undefined}
+                >
+                  {link.label}
+                </a>
+              </li>
+            ))}
+          </ul>
+        )}
+
+        {post.data.tags.length > 0 && (
+          <ul class="post-tags" aria-label="Tags">
+            {post.data.tags.map((tag) => <li>{tag}</li>)}
+          </ul>
+        )}
+      </header>
+
+      <div class="post-content">
+        <Content />
+      </div>
+    </article>
+  </main>
+</Layout>
+
+<style>
+  .post-page {
+    min-height: 70vh;
+  }
+
+  .post {
+    max-width: 52rem;
+  }
+
+  .post-back {
+    margin-bottom: 1rem;
+  }
+
+  .post-back a {
+    color: var(--color-accent-blue);
+    font-weight: 500;
+  }
+
+  .post-header {
+    margin-bottom: 2rem;
+  }
+
+  .post-header h1 {
+    font-size: clamp(2rem, 5vw, 3.25rem);
+  }
+
+  .post-description {
+    margin-top: 0.9rem;
+    font-size: var(--font-size-lg);
+  }
+
+  .post-meta {
+    margin-top: 1rem;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.8rem;
+    color: var(--color-ink-muted);
+    font-size: var(--font-size-sm);
+  }
+
+  .post-tags {
+    margin-top: 1rem;
+    list-style: none;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .post-tags li {
+    border: 1px solid var(--color-border);
+    border-radius: 999px;
+    padding: 0.22rem 0.55rem;
+    font-size: var(--font-size-xs);
+    color: var(--color-ink-secondary);
+  }
+
+  .post-links {
+    margin-top: 1rem;
+    list-style: none;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.6rem;
+  }
+
+  .post-links a {
+    display: inline-flex;
+    align-items: center;
+    border: 1px solid var(--color-border);
+    border-radius: 999px;
+    padding: 0.28rem 0.72rem;
+    color: var(--color-accent-blue);
+    font-size: var(--font-size-sm);
+    font-weight: 600;
+    text-decoration: none;
+  }
+
+  .post-links a:hover {
+    opacity: 0.8;
+  }
+
+  .post-content :global(h2),
+  .post-content :global(h3),
+  .post-content :global(h4) {
+    margin-top: 1.85rem;
+    margin-bottom: 0.8rem;
+  }
+
+  .post-content :global(h2) {
+    font-size: clamp(1.5rem, 2.4vw, 1.95rem);
+    line-height: 1.2;
+  }
+
+  .post-content :global(h3) {
+    font-size: clamp(1.2rem, 1.8vw, 1.45rem);
+    line-height: 1.28;
+  }
+
+  .post-content :global(h4) {
+    font-size: clamp(1.05rem, 1.4vw, 1.18rem);
+    line-height: 1.32;
+  }
+
+  .post-content :global(p),
+  .post-content :global(ul),
+  .post-content :global(ol),
+  .post-content :global(blockquote) {
+    margin-bottom: 1rem;
+  }
+
+  .post-content :global(p) {
+    font-size: 1.03rem;
+    line-height: 1.72;
+  }
+
+  .post-content :global(ul),
+  .post-content :global(ol) {
+    padding-left: 1.45rem;
+  }
+
+  .post-content :global(ul) {
+    list-style-type: disc;
+  }
+
+  .post-content :global(ol) {
+    list-style-type: decimal;
+  }
+
+  .post-content :global(ul ul) {
+    list-style-type: circle;
+  }
+
+  .post-content :global(ul ul ul) {
+    list-style-type: square;
+  }
+
+  .post-content :global(ol ol) {
+    list-style-type: lower-alpha;
+  }
+
+  .post-content :global(li) {
+    margin-bottom: 0.45rem;
+    line-height: 1.68;
+  }
+
+  .post-content :global(li > ul),
+  .post-content :global(li > ol) {
+    margin-top: 0.4rem;
+    margin-bottom: 0.4rem;
+    padding-left: 1.2rem;
+  }
+
+  .post-content :global(blockquote) {
+    border-left: 3px solid var(--color-border);
+    padding-left: 0.9rem;
+    color: var(--color-ink-secondary);
+  }
+
+  .post-content :global(a) {
+    color: var(--color-accent-blue);
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 2px;
+  }
+
+  .post-content :global(code) {
+    font-family: var(--font-family-mono);
+    font-size: 0.9em;
+    background: #f0f0ed;
+    padding: 0.1rem 0.35rem;
+    border-radius: var(--radius-sm);
+  }
+
+  .post-content :global(pre) {
+    padding: 1rem;
+    overflow-x: auto;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--color-border);
+    background: #f0f0ed;
+    margin-bottom: 1rem;
+  }
+
+  .post-content :global(pre code) {
+    background: transparent;
+    padding: 0;
+  }
+</style>

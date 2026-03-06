@@ -1,0 +1,354 @@
+---
+import { getCollection, render, type CollectionEntry } from "astro:content";
+import Layout from "@layouts/Layout.astro";
+
+type ResearchChapter = CollectionEntry<"research">;
+
+type PathParams = {
+  document: string;
+  chapter: string;
+};
+
+export async function getStaticPaths() {
+  const chapters = await getCollection("research");
+  const visibleDocuments = await getCollection(
+    "researchDocuments",
+    ({ data }) => !data.draft,
+  );
+  const visibleDocumentIds = new Set(visibleDocuments.map((doc) => doc.data.document));
+
+  return chapters
+    .filter((entry) => visibleDocumentIds.has(entry.data.document))
+    .map((entry) => {
+    const [document, chapter] = entry.slug.split("/");
+
+    if (!document || !chapter) {
+      throw new Error(`Invalid research slug format: ${entry.slug}`);
+    }
+
+    return {
+      params: { document, chapter },
+      props: { entry },
+    };
+    });
+}
+
+const { entry } = Astro.props as { entry: ResearchChapter };
+const params = Astro.params as PathParams;
+
+const { Content } = await render(entry);
+
+const [documentIndex] = await getCollection(
+  "researchDocuments",
+  ({ data }) => !data.draft && data.document === entry.data.document,
+);
+
+if (!documentIndex) {
+  throw new Error(`Missing research document index metadata for document '${entry.data.document}'.`);
+}
+
+const chaptersInDocument = (await getCollection(
+  "research",
+  ({ data }) => data.document === entry.data.document,
+)).sort((a, b) => a.data.chapter - b.data.chapter);
+
+const currentIndex = chaptersInDocument.findIndex((c) => c.id === entry.id);
+if (currentIndex === -1) {
+  throw new Error(`Current chapter not found in document list: ${entry.id}`);
+}
+
+const previous = chaptersInDocument[currentIndex - 1];
+const next = chaptersInDocument[currentIndex + 1];
+
+function chapterLink(chapter: ResearchChapter) {
+  const [document, chapterSlug] = chapter.slug.split("/");
+  if (!document || !chapterSlug) {
+    throw new Error(`Invalid research slug format: ${chapter.slug}`);
+  }
+  return `/research/${document}/${chapterSlug}/`;
+}
+
+const dateFormatter = new Intl.DateTimeFormat("en-US", { dateStyle: "long" });
+---
+
+<Layout
+  title={`${entry.data.chapterTitle} — ${documentIndex.data.documentTitle}`}
+  description={documentIndex.data.documentDescription}
+  canonical={`/research/${params.document}/${params.chapter}/`}
+>
+  <main id="main-content" class="research-doc-page">
+    <article class="research-doc container section" data-animate>
+      <p class="research-back"><a href="/writing/">← Back to writing</a></p>
+
+      <header class="research-doc__header">
+        <p class="research-doc__eyebrow">{documentIndex.data.documentTitle}</p>
+        <h1>{entry.data.chapterTitle}</h1>
+        <p class="research-doc__desc">{documentIndex.data.documentDescription}</p>
+
+        <div class="research-doc__meta">
+          <span>Chapter {entry.data.chapter} of {chaptersInDocument.length}</span>
+          <time datetime={entry.data.publishDate.toISOString()}>
+            Published {dateFormatter.format(entry.data.publishDate)}
+          </time>
+          {entry.data.estimatedReadMinutes && <span>{entry.data.estimatedReadMinutes} min read</span>}
+        </div>
+      </header>
+
+      <div class="research-body">
+        <div class="research-content">
+          <Content />
+        </div>
+
+        <aside class="research-outline" aria-label="Document chapters">
+          <h2>Document Outline</h2>
+          <p class="research-outline__hint">Summary follows while you scroll.</p>
+          <ol>
+            {chaptersInDocument.map((chapter) => (
+              <li class={chapter.id === entry.id ? "is-active" : undefined}>
+                <a href={chapterLink(chapter)}>
+                  {chapter.data.chapter}. {chapter.data.chapterTitle}
+                </a>
+              </li>
+            ))}
+          </ol>
+        </aside>
+      </div>
+
+      <nav class="research-pagination" aria-label="Chapter navigation">
+        <div>
+          {previous ? <a href={chapterLink(previous)}>← {previous.data.chapterTitle}</a> : <span />}
+        </div>
+        <div>
+          {next ? <a href={chapterLink(next)}>{next.data.chapterTitle} →</a> : <span />}
+        </div>
+      </nav>
+    </article>
+  </main>
+</Layout>
+
+<style>
+  .research-doc-page {
+    min-height: 70vh;
+  }
+
+  .research-doc {
+    max-width: 80rem;
+    position: relative;
+    overflow: visible;
+  }
+
+  .research-back {
+    margin-bottom: 1rem;
+  }
+
+  .research-back a {
+    color: var(--color-accent-blue);
+    font-weight: 500;
+  }
+
+  .research-doc__header {
+    margin-bottom: 1.5rem;
+  }
+
+  .research-doc__eyebrow {
+    color: var(--color-accent-blue);
+    font-size: var(--font-size-sm);
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  .research-doc__header h1 {
+    margin-top: 0.5rem;
+    font-size: clamp(1.8rem, 4.5vw, 3rem);
+  }
+
+  .research-doc__desc {
+    margin-top: 0.7rem;
+    font-size: var(--font-size-lg);
+  }
+
+  .research-doc__meta {
+    margin-top: 1rem;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.8rem;
+    color: var(--color-ink-muted);
+    font-size: var(--font-size-sm);
+  }
+
+  .research-body {
+    display: grid;
+    gap: 1.25rem;
+  }
+
+  .research-outline {
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    background: var(--color-surface);
+    padding: 1rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .research-outline h2 {
+    font-size: var(--font-size-base);
+    margin-bottom: 0.6rem;
+  }
+
+  .research-outline__hint {
+    margin-bottom: 0.7rem;
+    font-size: var(--font-size-xs);
+    color: var(--color-ink-muted);
+  }
+
+  .research-outline ol {
+    margin: 0;
+    padding-left: 1.2rem;
+    display: grid;
+    gap: 0.3rem;
+  }
+
+  .research-outline li {
+    color: var(--color-ink-secondary);
+  }
+
+  .research-outline li.is-active a {
+    color: var(--color-accent-blue);
+    font-weight: 600;
+  }
+
+  .research-content :global(h2),
+  .research-content :global(h3),
+  .research-content :global(h4) {
+    margin-top: 1.8rem;
+    margin-bottom: 0.7rem;
+  }
+
+  .research-content :global(h2) {
+    font-size: clamp(1.5rem, 2.4vw, 1.95rem);
+    line-height: 1.2;
+  }
+
+  .research-content :global(h3) {
+    font-size: clamp(1.2rem, 1.8vw, 1.45rem);
+    line-height: 1.28;
+  }
+
+  .research-content :global(h4) {
+    font-size: clamp(1.05rem, 1.4vw, 1.18rem);
+    line-height: 1.32;
+  }
+
+  .research-content :global(p),
+  .research-content :global(ul),
+  .research-content :global(ol),
+  .research-content :global(blockquote) {
+    margin-bottom: 1rem;
+  }
+
+  .research-content :global(p) {
+    font-size: 1.03rem;
+    line-height: 1.72;
+  }
+
+  .research-content :global(ul),
+  .research-content :global(ol) {
+    padding-left: 1.45rem;
+  }
+
+  .research-content :global(ul) {
+    list-style-type: disc;
+  }
+
+  .research-content :global(ol) {
+    list-style-type: decimal;
+  }
+
+  .research-content :global(ul ul) {
+    list-style-type: circle;
+  }
+
+  .research-content :global(ul ul ul) {
+    list-style-type: square;
+  }
+
+  .research-content :global(ol ol) {
+    list-style-type: lower-alpha;
+  }
+
+  .research-content :global(li) {
+    margin-bottom: 0.45rem;
+    line-height: 1.68;
+  }
+
+  .research-content :global(li > ul),
+  .research-content :global(li > ol) {
+    margin-top: 0.4rem;
+    margin-bottom: 0.4rem;
+    padding-left: 1.2rem;
+  }
+
+  .research-content :global(blockquote) {
+    border-left: 3px solid var(--color-border);
+    padding-left: 0.9rem;
+    color: var(--color-ink-secondary);
+  }
+
+  .research-content :global(code) {
+    font-family: var(--font-family-mono);
+    font-size: 0.9em;
+    background: #f0f0ed;
+    padding: 0.1rem 0.35rem;
+    border-radius: var(--radius-sm);
+  }
+
+  .research-content :global(pre) {
+    margin-bottom: 1rem;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    background: #f0f0ed;
+    padding: 1rem;
+    overflow-x: auto;
+  }
+
+  .research-content :global(pre code) {
+    background: transparent;
+    padding: 0;
+  }
+
+  .research-pagination {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--color-border);
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+  }
+
+  .research-pagination a {
+    color: var(--color-accent-blue);
+    font-weight: 500;
+  }
+
+  @media (min-width: 1024px) {
+    .research-body {
+      grid-template-columns: minmax(0, 56rem) 20rem;
+      align-items: start;
+      justify-content: center;
+    }
+
+    .research-content {
+      max-width: 56rem;
+    }
+
+    .research-outline {
+      position: sticky;
+      top: 6.5rem;
+      width: 20rem;
+      max-height: calc(100vh - 8rem);
+      overflow: auto;
+      z-index: 1;
+      margin-bottom: 0;
+    }
+  }
+</style>

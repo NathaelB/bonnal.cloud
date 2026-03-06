@@ -1,0 +1,201 @@
+---
+import { getCollection, type CollectionEntry } from "astro:content";
+
+type BlogEntry = CollectionEntry<"blog">;
+type ResearchChapterEntry = CollectionEntry<"research">;
+type ResearchDocumentEntry = CollectionEntry<"researchDocuments">;
+
+type WritingPreviewItem = {
+  kind: "article" | "research";
+  title: string;
+  description: string;
+  href: string;
+  publishDate: Date;
+};
+
+const posts = (await getCollection("blog", ({ data }) => !data.draft)).map<WritingPreviewItem>((post: BlogEntry) => ({
+  kind: "article",
+  title: post.data.title,
+  description: post.data.description,
+  href: `/blog/${post.slug}/`,
+  publishDate: post.data.publishDate,
+}));
+
+const researchChapters = await getCollection("research");
+const researchDocuments = await getCollection(
+  "researchDocuments",
+  ({ data }) => !data.draft,
+);
+
+const chaptersByDocument = new Map<string, ResearchChapterEntry[]>();
+for (const chapter of researchChapters) {
+  const arr = chaptersByDocument.get(chapter.data.document);
+  if (arr) {
+    arr.push(chapter);
+  } else {
+    chaptersByDocument.set(chapter.data.document, [chapter]);
+  }
+}
+
+const researchDocs: WritingPreviewItem[] = researchDocuments
+  .map((doc: ResearchDocumentEntry) => {
+    const chapters = (chaptersByDocument.get(doc.data.document) ?? []).sort(
+      (a, b) => a.data.chapter - b.data.chapter,
+    );
+    const first = chapters[0];
+    if (!first) return null;
+
+    const [, chapterSlug] = first.slug.split("/");
+    if (!chapterSlug) {
+      throw new Error(`Invalid research slug format: ${first.slug}`);
+    }
+
+    return {
+      kind: "research",
+      title: doc.data.documentTitle,
+      description: doc.data.documentDescription,
+      href: `/research/${doc.data.document}/${chapterSlug}/`,
+      publishDate: doc.data.publishDate,
+    } satisfies WritingPreviewItem;
+  })
+  .filter((doc): doc is WritingPreviewItem => doc !== null);
+
+const items = [...posts, ...researchDocs]
+  .sort((a, b) => b.publishDate.getTime() - a.publishDate.getTime())
+  .slice(0, 4);
+
+const dateFormatter = new Intl.DateTimeFormat("en-US", {
+  dateStyle: "long",
+});
+---
+
+<section class="section home-writing" aria-label="Latest writing">
+  <div class="container">
+    <div class="home-writing__header" data-animate>
+      <p class="home-writing__overline">Writing</p>
+      <h2>Latest articles and research</h2>
+      <a class="home-writing__all" href="/writing/">Open writing hub →</a>
+    </div>
+
+    {
+      items.length > 0 ? (
+        <ul class="home-writing__list" data-animate-children>
+          {items.map((item) => (
+            <li class="home-writing__item">
+              <a href={item.href} class="home-writing__link">
+                <p class="home-writing__meta">
+                  <span class:list={["home-writing__kind", item.kind === "research" && "home-writing__kind--research"]}>
+                    {item.kind === "research" ? "Research" : "Article"}
+                  </span>
+                  {dateFormatter.format(item.publishDate)}
+                </p>
+                <h3>{item.title}</h3>
+                <p>{item.description}</p>
+              </a>
+            </li>
+          ))}
+        </ul>
+      ) : (
+        <p class="home-writing__empty">No writing published yet.</p>
+      )
+    }
+  </div>
+</section>
+
+<style>
+  .home-writing {
+    border-top: 1px solid var(--color-border);
+  }
+
+  .home-writing__header {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 0.75rem 1rem;
+    margin-bottom: 1.25rem;
+  }
+
+  .home-writing__overline {
+    width: 100%;
+    font-size: var(--font-size-xs);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--color-accent-blue);
+    font-weight: 600;
+  }
+
+  .home-writing__header h2 {
+    font-size: clamp(1.5rem, 3vw, 2rem);
+  }
+
+  .home-writing__all {
+    color: var(--color-accent-blue);
+    font-size: var(--font-size-sm);
+    font-weight: 600;
+  }
+
+  .home-writing__all:hover {
+    opacity: 0.8;
+  }
+
+  .home-writing__list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  @media (min-width: 960px) {
+    .home-writing__list {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  .home-writing__item {
+    border: 1px solid var(--color-border);
+    background: var(--color-surface);
+    border-radius: var(--radius-md);
+  }
+
+  .home-writing__link {
+    display: block;
+    padding: 1rem;
+  }
+
+  .home-writing__meta {
+    color: var(--color-ink-muted);
+    font-size: var(--font-size-xs);
+    margin-bottom: 0.4rem;
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+
+  .home-writing__kind {
+    border: 1px solid var(--color-border);
+    border-radius: 999px;
+    padding: 0.06rem 0.45rem;
+    color: var(--color-accent-blue);
+  }
+
+  .home-writing__kind--research {
+    color: #0f766e;
+  }
+
+  .home-writing__link h3 {
+    font-size: var(--font-size-lg);
+    line-height: var(--line-height-snug);
+  }
+
+  .home-writing__link p {
+    margin-top: 0.5rem;
+  }
+
+  .home-writing__empty {
+    color: var(--color-ink-secondary);
+  }
+</style>

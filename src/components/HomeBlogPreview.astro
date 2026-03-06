@@ -1,0 +1,122 @@
+---
+import { getCollection } from "astro:content";
+
+const posts = (await getCollection("blog", ({ data }) => !data.draft))
+  .sort((a, b) => b.data.publishDate.getTime() - a.data.publishDate.getTime())
+  .slice(0, 3);
+
+const dateFormatter = new Intl.DateTimeFormat("en-US", {
+  dateStyle: "long",
+});
+---
+
+<section class="section home-blog" aria-label="Latest blog articles">
+  <div class="container">
+    <div class="home-blog__header" data-animate>
+      <p class="home-blog__overline">Blog</p>
+      <h2>Latest articles</h2>
+      <a class="home-blog__all" href="/blog/">Go to blog home →</a>
+    </div>
+
+    {
+      posts.length > 0 ? (
+        <ul class="home-blog__list" data-animate-children>
+          {posts.map((post) => (
+            <li class="home-blog__item">
+              <a href={`/blog/${post.slug}/`} class="home-blog__link">
+                <p class="home-blog__date">{dateFormatter.format(post.data.publishDate)}</p>
+                <h3>{post.data.title}</h3>
+                <p>{post.data.description}</p>
+              </a>
+            </li>
+          ))}
+        </ul>
+      ) : (
+        <p class="home-blog__empty">No article published yet.</p>
+      )
+    }
+  </div>
+</section>
+
+<style>
+  .home-blog {
+    border-top: 1px solid var(--color-border);
+  }
+
+  .home-blog__header {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 0.75rem 1rem;
+    margin-bottom: 1.25rem;
+  }
+
+  .home-blog__overline {
+    width: 100%;
+    font-size: var(--font-size-xs);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--color-accent-blue);
+    font-weight: 600;
+  }
+
+  .home-blog__header h2 {
+    font-size: clamp(1.5rem, 3vw, 2rem);
+  }
+
+  .home-blog__all {
+    color: var(--color-accent-blue);
+    font-size: var(--font-size-sm);
+    font-weight: 600;
+  }
+
+  .home-blog__all:hover {
+    opacity: 0.8;
+  }
+
+  .home-blog__list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  @media (min-width: 960px) {
+    .home-blog__list {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+
+  .home-blog__item {
+    border: 1px solid var(--color-border);
+    background: var(--color-surface);
+    border-radius: var(--radius-md);
+  }
+
+  .home-blog__link {
+    display: block;
+    padding: 1rem;
+  }
+
+  .home-blog__date {
+    color: var(--color-ink-muted);
+    font-size: var(--font-size-xs);
+    margin-bottom: 0.4rem;
+  }
+
+  .home-blog__link h3 {
+    font-size: var(--font-size-lg);
+    line-height: var(--line-height-snug);
+  }
+
+  .home-blog__link p {
+    margin-top: 0.5rem;
+  }
+
+  .home-blog__empty {
+    color: var(--color-ink-secondary);
+  }
+</style>

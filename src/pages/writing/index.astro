@@ -1,0 +1,235 @@
+---
+import { getCollection, type CollectionEntry } from "astro:content";
+import Layout from "@layouts/Layout.astro";
+
+type BlogEntry = CollectionEntry<"blog">;
+type ResearchChapterEntry = CollectionEntry<"research">;
+type ResearchDocumentEntry = CollectionEntry<"researchDocuments">;
+
+type WritingItem = {
+  type: "article" | "research";
+  title: string;
+  description: string;
+  href: string;
+  publishDate: Date;
+  tags: string[];
+  meta: string;
+};
+
+const posts = (await getCollection("blog", ({ data }) => !data.draft)).map<WritingItem>((post: BlogEntry) => ({
+  type: "article",
+  title: post.data.title,
+  description: post.data.description,
+  href: `/blog/${post.slug}/`,
+  publishDate: post.data.publishDate,
+  tags: post.data.tags,
+  meta: "Article",
+}));
+
+const researchChapters = await getCollection("research");
+const researchDocuments = await getCollection(
+  "researchDocuments",
+  ({ data }) => !data.draft,
+);
+
+const chaptersByDocument = new Map<string, ResearchChapterEntry[]>();
+for (const chapter of researchChapters) {
+  const arr = chaptersByDocument.get(chapter.data.document);
+  if (arr) {
+    arr.push(chapter);
+  } else {
+    chaptersByDocument.set(chapter.data.document, [chapter]);
+  }
+}
+
+const researchDocs: WritingItem[] = researchDocuments
+  .map((doc: ResearchDocumentEntry) => {
+    const chapters = (chaptersByDocument.get(doc.data.document) ?? []).sort(
+      (a, b) => a.data.chapter - b.data.chapter,
+    );
+    const firstChapter = chapters[0];
+
+    if (!firstChapter) return null;
+
+    const [, chapterSlug] = firstChapter.slug.split("/");
+    if (!chapterSlug) {
+      throw new Error(`Invalid research slug format: ${firstChapter.slug}`);
+    }
+
+    return {
+      type: "research",
+      title: doc.data.documentTitle,
+      description: doc.data.documentDescription,
+      href: `/research/${doc.data.document}/${chapterSlug}/`,
+      publishDate: doc.data.publishDate,
+      tags: doc.data.tags,
+      meta: `Research · ${chapters.length} chapters`,
+    } satisfies WritingItem;
+  })
+  .filter((doc): doc is WritingItem => doc !== null);
+
+const items = [...posts, ...researchDocs].sort(
+  (a, b) => b.publishDate.getTime() - a.publishDate.getTime(),
+);
+
+const dateFormatter = new Intl.DateTimeFormat("en-US", { dateStyle: "long" });
+---
+
+<Layout title="Writing — Nathael B." description="Articles and long-form research documents in one place.">
+  <main id="main-content" class="writing-page">
+    <section class="section">
+      <div class="container">
+        <header class="writing-header" data-animate>
+          <p class="writing-back"><a href="/">← Back to home</a></p>
+          <p class="writing-overline">Writing</p>
+          <h1>Articles & Research</h1>
+          <p class="writing-intro">
+            One place for technical articles and long-form research documents.
+          </p>
+        </header>
+
+        {
+          items.length > 0 ? (
+            <ul class="writing-list" data-animate-children>
+              {items.map((item) => (
+                <li class="writing-item">
+                  <a href={item.href} class="writing-link">
+                    <div class="writing-meta">
+                      <span class:list={["writing-kind", item.type === "research" && "writing-kind--research"]}>
+                        {item.meta}
+                      </span>
+                      <time datetime={item.publishDate.toISOString()}>
+                        {dateFormatter.format(item.publishDate)}
+                      </time>
+                    </div>
+
+                    <h2>{item.title}</h2>
+                    <p>{item.description}</p>
+
+                    {item.tags.length > 0 && (
+                      <ul class="writing-tags" aria-label="Tags">
+                        {item.tags.map((tag) => <li>{tag}</li>)}
+                      </ul>
+                    )}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p class="writing-empty">No content published yet.</p>
+          )
+        }
+      </div>
+    </section>
+  </main>
+</Layout>
+
+<style>
+  .writing-page {
+    min-height: 70vh;
+  }
+
+  .writing-header {
+    max-width: 48rem;
+    margin-bottom: 2rem;
+    display: grid;
+    gap: 0.75rem;
+  }
+
+  .writing-back a {
+    color: var(--color-accent-blue);
+    font-size: var(--font-size-sm);
+    font-weight: 500;
+  }
+
+  .writing-overline {
+    font-size: var(--font-size-sm);
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--color-accent-blue);
+  }
+
+  .writing-header h1 {
+    font-size: clamp(2rem, 5vw, 3rem);
+    line-height: 1.1;
+  }
+
+  .writing-intro {
+    max-width: 36rem;
+    color: var(--color-ink-secondary);
+  }
+
+  .writing-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 1rem;
+  }
+
+  .writing-item {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+  }
+
+  .writing-link {
+    display: block;
+    padding: 1.25rem;
+    transition: transform 0.15s ease;
+  }
+
+  .writing-link:hover {
+    transform: translateY(-1px);
+  }
+
+  .writing-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    align-items: center;
+    margin-bottom: 0.5rem;
+    color: var(--color-ink-muted);
+    font-size: var(--font-size-sm);
+  }
+
+  .writing-kind {
+    border: 1px solid var(--color-border);
+    border-radius: 999px;
+    padding: 0.1rem 0.5rem;
+    font-size: var(--font-size-xs);
+    color: var(--color-accent-blue);
+  }
+
+  .writing-kind--research {
+    color: #0f766e;
+  }
+
+  .writing-link h2 {
+    margin: 0;
+    font-size: var(--font-size-xl);
+  }
+
+  .writing-link p {
+    margin-top: 0.6rem;
+  }
+
+  .writing-tags {
+    margin-top: 1rem;
+    list-style: none;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .writing-tags li {
+    border: 1px solid var(--color-border);
+    border-radius: 999px;
+    padding: 0.22rem 0.55rem;
+    font-size: var(--font-size-xs);
+    color: var(--color-ink-secondary);
+    text-transform: lowercase;
+  }
+</style>

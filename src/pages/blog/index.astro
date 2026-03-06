@@ -1,0 +1,149 @@
+---
+import { getCollection } from "astro:content";
+import Layout from "@layouts/Layout.astro";
+
+const posts = (await getCollection("blog", ({ data }) => !data.draft)).sort(
+  (a, b) => b.data.publishDate.getTime() - a.data.publishDate.getTime(),
+);
+
+const dateFormatter = new Intl.DateTimeFormat("en-US", {
+  dateStyle: "long",
+});
+---
+
+<Layout
+  title="Blog — Nathael B."
+  description="Technical writing about cloud architecture, distributed systems, and software engineering."
+>
+  <main id="main-content" class="blog-page">
+    <section class="section">
+      <div class="container">
+        <header class="blog-header" data-animate>
+          <p class="blog-overline">Writing</p>
+          <h1>Blog</h1>
+          <p class="blog-intro">Articles written in Markdown and published on bonnal.cloud.</p>
+        </header>
+
+        <ul class="post-list" data-animate-children>
+          {
+            posts.map((post) => (
+              <li class="post-item">
+                <a class="post-link" href={`/blog/${post.slug}/`}>
+                  <div class="post-meta">
+                    <time datetime={post.data.publishDate.toISOString()}>
+                      {dateFormatter.format(post.data.publishDate)}
+                    </time>
+                    {post.data.updatedDate && (
+                      <span>
+                        Updated {dateFormatter.format(post.data.updatedDate)}
+                      </span>
+                    )}
+                  </div>
+
+                  <h2>{post.data.title}</h2>
+                  <p>{post.data.description}</p>
+
+                  {post.data.tags.length > 0 && (
+                    <ul class="post-tags" aria-label="Tags">
+                      {post.data.tags.map((tag) => <li>{tag}</li>)}
+                    </ul>
+                  )}
+                </a>
+              </li>
+            ))
+          }
+        </ul>
+      </div>
+    </section>
+  </main>
+</Layout>
+
+<style>
+  .blog-page {
+    min-height: 70vh;
+  }
+
+  .blog-header {
+    max-width: 42rem;
+    margin-bottom: 2rem;
+    display: grid;
+    gap: 0.75rem;
+  }
+
+  .blog-overline {
+    font-size: var(--font-size-sm);
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--color-accent-blue);
+  }
+
+  .blog-header h1 {
+    font-size: clamp(2rem, 5vw, 3rem);
+    line-height: 1.1;
+  }
+
+  .blog-intro {
+    max-width: 36rem;
+    color: var(--color-ink-secondary);
+  }
+
+  .post-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 1rem;
+  }
+
+  .post-item {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+  }
+
+  .post-link {
+    display: block;
+    padding: 1.25rem;
+    transition: border-color 0.15s ease, transform 0.15s ease;
+  }
+
+  .post-link:hover {
+    transform: translateY(-1px);
+  }
+
+  .post-meta {
+    display: flex;
+    gap: 0.75rem;
+    margin-bottom: 0.5rem;
+    color: var(--color-ink-muted);
+    font-size: var(--font-size-sm);
+  }
+
+  .post-link h2 {
+    margin: 0;
+    font-size: var(--font-size-xl);
+  }
+
+  .post-link p {
+    margin-top: 0.6rem;
+  }
+
+  .post-tags {
+    margin-top: 1rem;
+    list-style: none;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .post-tags li {
+    border: 1px solid var(--color-border);
+    border-radius: 999px;
+    padding: 0.22rem 0.55rem;
+    font-size: var(--font-size-xs);
+    color: var(--color-ink-secondary);
+    text-transform: lowercase;
+  }
+</style>
