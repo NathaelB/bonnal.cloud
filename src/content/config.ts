@@ -1,9 +1,5 @@
 /**
  * Astro content collections schema.
- *
- * Blog collection is defined here for future use.
- * No blog pages are generated until content is added
- * and a [slug].astro route is created under pages/writing/.
  */
 import { defineCollection, z } from "astro:content";
 
@@ -25,7 +21,7 @@ const blog = defineCollection({
   }),
 });
 
-const research = defineCollection({
+const documents = defineCollection({
   type: "content",
   schema: z.object({
     document: z.string(),
@@ -37,7 +33,7 @@ const research = defineCollection({
   }),
 });
 
-const researchDocuments = defineCollection({
+const documentIndex = defineCollection({
   type: "content",
   schema: z.object({
     document: z.string(),
@@ -51,4 +47,4 @@ const researchDocuments = defineCollection({
   }),
 });
 
-export const collections = { blog, research, researchDocuments };
+export const collections = { blog, documents, documentIndex };

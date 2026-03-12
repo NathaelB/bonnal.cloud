@@ -3,11 +3,11 @@ import { getCollection, type CollectionEntry } from "astro:content";
 import Layout from "@layouts/Layout.astro";
 
 type BlogEntry = CollectionEntry<"blog">;
-type ResearchChapterEntry = CollectionEntry<"research">;
-type ResearchDocumentEntry = CollectionEntry<"researchDocuments">;
+type ResearchChapterEntry = CollectionEntry<"documents">;
+type ResearchDocumentEntry = CollectionEntry<"documentIndex">;
 
 type WritingItem = {
-  type: "article" | "research";
+  type: "article" | "document";
   title: string;
   description: string;
   href: string;
@@ -26,9 +26,9 @@ const posts = (await getCollection("blog", ({ data }) => !data.draft)).map<Writi
   meta: "Article",
 }));
 
-const researchChapters = await getCollection("research");
+const researchChapters = await getCollection("documents");
 const researchDocuments = await getCollection(
-  "researchDocuments",
+  "documentIndex",
   ({ data }) => !data.draft,
 );
 
@@ -57,13 +57,13 @@ const researchDocs: WritingItem[] = researchDocuments
     }
 
     return {
-      type: "research",
+      type: "document",
       title: doc.data.documentTitle,
       description: doc.data.documentDescription,
-      href: `/research/${doc.data.document}/${chapterSlug}/`,
+      href: `/documents/${doc.data.document}/${chapterSlug}/`,
       publishDate: doc.data.publishDate,
       tags: doc.data.tags,
-      meta: `Research · ${chapters.length} chapters`,
+      meta: `Document · ${chapters.length} chapters`,
     } satisfies WritingItem;
   })
   .filter((doc): doc is WritingItem => doc !== null);
@@ -82,9 +82,9 @@ const dateFormatter = new Intl.DateTimeFormat("en-US", { dateStyle: "long" });
         <header class="writing-header" data-animate>
           <p class="writing-back"><a href="/">← Back to home</a></p>
           <p class="writing-overline">Writing</p>
-          <h1>Articles & Research</h1>
+          <h1>Articles & Documents</h1>
           <p class="writing-intro">
-            One place for technical articles and long-form research documents.
+            Articles courts et documents longs découpés en chapitres.
           </p>
         </header>
 
@@ -95,7 +95,7 @@ const dateFormatter = new Intl.DateTimeFormat("en-US", { dateStyle: "long" });
                 <li class="writing-item">
                   <a href={item.href} class="writing-link">
                     <div class="writing-meta">
-                      <span class:list={["writing-kind", item.type === "research" && "writing-kind--research"]}>
+                      <span class:list={["writing-kind", item.type === "document" && "writing-kind--document"]}>
                         {item.meta}
                       </span>
                       <time datetime={item.publishDate.toISOString()}>
@@ -202,7 +202,7 @@ const dateFormatter = new Intl.DateTimeFormat("en-US", { dateStyle: "long" });
     color: var(--color-accent-blue);
   }
 
-  .writing-kind--research {
+  .writing-kind--document {
     color: #0f766e;
   }
 

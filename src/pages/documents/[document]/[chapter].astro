@@ -2,7 +2,7 @@
 import { getCollection, render, type CollectionEntry } from "astro:content";
 import Layout from "@layouts/Layout.astro";
 
-type ResearchChapter = CollectionEntry<"research">;
+type DocumentChapter = CollectionEntry<"documents">;
 
 type PathParams = {
   document: string;
@@ -10,9 +10,9 @@ type PathParams = {
 };
 
 export async function getStaticPaths() {
-  const chapters = await getCollection("research");
+  const chapters = await getCollection("documents");
   const visibleDocuments = await getCollection(
-    "researchDocuments",
+    "documentIndex",
     ({ data }) => !data.draft,
   );
   const visibleDocumentIds = new Set(visibleDocuments.map((doc) => doc.data.document));
@@ -20,35 +20,35 @@ export async function getStaticPaths() {
   return chapters
     .filter((entry) => visibleDocumentIds.has(entry.data.document))
     .map((entry) => {
-    const [document, chapter] = entry.slug.split("/");
+      const [document, chapter] = entry.slug.split("/");
 
-    if (!document || !chapter) {
-      throw new Error(`Invalid research slug format: ${entry.slug}`);
-    }
+      if (!document || !chapter) {
+        throw new Error(`Invalid document slug format: ${entry.slug}`);
+      }
 
-    return {
-      params: { document, chapter },
-      props: { entry },
-    };
+      return {
+        params: { document, chapter },
+        props: { entry },
+      };
     });
 }
 
-const { entry } = Astro.props as { entry: ResearchChapter };
+const { entry } = Astro.props as { entry: DocumentChapter };
 const params = Astro.params as PathParams;
 
 const { Content } = await render(entry);
 
 const [documentIndex] = await getCollection(
-  "researchDocuments",
+  "documentIndex",
   ({ data }) => !data.draft && data.document === entry.data.document,
 );
 
 if (!documentIndex) {
-  throw new Error(`Missing research document index metadata for document '${entry.data.document}'.`);
+  throw new Error(`Missing document index metadata for '${entry.data.document}'.`);
 }
 
 const chaptersInDocument = (await getCollection(
-  "research",
+  "documents",
   ({ data }) => data.document === entry.data.document,
 )).sort((a, b) => a.data.chapter - b.data.chapter);
 
@@ -60,12 +60,12 @@ if (currentIndex === -1) {
 const previous = chaptersInDocument[currentIndex - 1];
 const next = chaptersInDocument[currentIndex + 1];
 
-function chapterLink(chapter: ResearchChapter) {
+function chapterLink(chapter: DocumentChapter) {
   const [document, chapterSlug] = chapter.slug.split("/");
   if (!document || !chapterSlug) {
-    throw new Error(`Invalid research slug format: ${chapter.slug}`);
+    throw new Error(`Invalid document slug format: ${chapter.slug}`);
   }
-  return `/research/${document}/${chapterSlug}/`;
+  return `/documents/${document}/${chapterSlug}/`;
 }
 
 const dateFormatter = new Intl.DateTimeFormat("en-US", { dateStyle: "long" });
@@ -74,18 +74,18 @@ const dateFormatter = new Intl.DateTimeFormat("en-US", { dateStyle: "long" });
 <Layout
   title={`${entry.data.chapterTitle} — ${documentIndex.data.documentTitle}`}
   description={documentIndex.data.documentDescription}
-  canonical={`/research/${params.document}/${params.chapter}/`}
+  canonical={`/documents/${params.document}/${params.chapter}/`}
 >
-  <main id="main-content" class="research-doc-page">
-    <article class="research-doc container section" data-animate>
-      <p class="research-back"><a href="/writing/">← Back to writing</a></p>
+  <main id="main-content" class="doc-page">
+    <article class="doc container section" data-animate>
+      <p class="doc-back"><a href="/writing/">← Back to writing</a></p>
 
-      <header class="research-doc__header">
-        <p class="research-doc__eyebrow">{documentIndex.data.documentTitle}</p>
+      <header class="doc__header">
+        <p class="doc__eyebrow">{documentIndex.data.documentTitle}</p>
         <h1>{entry.data.chapterTitle}</h1>
-        <p class="research-doc__desc">{documentIndex.data.documentDescription}</p>
+        <p class="doc__desc">{documentIndex.data.documentDescription}</p>
 
-        <div class="research-doc__meta">
+        <div class="doc__meta">
           <span>Chapter {entry.data.chapter} of {chaptersInDocument.length}</span>
           <time datetime={entry.data.publishDate.toISOString()}>
             Published {dateFormatter.format(entry.data.publishDate)}
@@ -94,14 +94,14 @@ const dateFormatter = new Intl.DateTimeFormat("en-US", { dateStyle: "long" });
         </div>
       </header>
 
-      <div class="research-body">
-        <div class="research-content">
+      <div class="doc-body">
+        <div class="doc-content">
           <Content />
         </div>
 
-        <aside class="research-outline" aria-label="Document chapters">
+        <aside class="doc-outline" aria-label="Document chapters">
           <h2>Document Outline</h2>
-          <p class="research-outline__hint">Summary follows while you scroll.</p>
+          <p class="doc-outline__hint">Summary follows while you scroll.</p>
           <ol>
             {chaptersInDocument.map((chapter) => (
               <li class={chapter.id === entry.id ? "is-active" : undefined}>
@@ -114,7 +114,7 @@ const dateFormatter = new Intl.DateTimeFormat("en-US", { dateStyle: "long" });
         </aside>
       </div>
 
-      <nav class="research-pagination" aria-label="Chapter navigation">
+      <nav class="doc-pagination" aria-label="Chapter navigation">
         <div>
           {previous ? <a href={chapterLink(previous)}>← {previous.data.chapterTitle}</a> : <span />}
         </div>
@@ -127,30 +127,30 @@ const dateFormatter = new Intl.DateTimeFormat("en-US", { dateStyle: "long" });
 </Layout>
 
 <style>
-  .research-doc-page {
+  .doc-page {
     min-height: 70vh;
   }
 
-  .research-doc {
+  .doc {
     max-width: 80rem;
     position: relative;
     overflow: visible;
   }
 
-  .research-back {
+  .doc-back {
     margin-bottom: 1rem;
   }
 
-  .research-back a {
+  .doc-back a {
     color: var(--color-accent-blue);
     font-weight: 500;
   }
 
-  .research-doc__header {
+  .doc__header {
     margin-bottom: 1.5rem;
   }
 
-  .research-doc__eyebrow {
+  .doc__eyebrow {
     color: var(--color-accent-blue);
     font-size: var(--font-size-sm);
     font-weight: 600;
@@ -158,17 +158,17 @@ const dateFormatter = new Intl.DateTimeFormat("en-US", { dateStyle: "long" });
     text-transform: uppercase;
   }
 
-  .research-doc__header h1 {
+  .doc__header h1 {
     margin-top: 0.5rem;
     font-size: clamp(1.8rem, 4.5vw, 3rem);
   }
 
-  .research-doc__desc {
+  .doc__desc {
     margin-top: 0.7rem;
     font-size: var(--font-size-lg);
   }
 
-  .research-doc__meta {
+  .doc__meta {
     margin-top: 1rem;
     display: flex;
     flex-wrap: wrap;
@@ -177,12 +177,12 @@ const dateFormatter = new Intl.DateTimeFormat("en-US", { dateStyle: "long" });
     font-size: var(--font-size-sm);
   }
 
-  .research-body {
+  .doc-body {
     display: grid;
     gap: 1.25rem;
   }
 
-  .research-outline {
+  .doc-outline {
     border: 1px solid var(--color-border);
     border-radius: var(--radius-md);
     background: var(--color-surface);
@@ -190,119 +190,108 @@ const dateFormatter = new Intl.DateTimeFormat("en-US", { dateStyle: "long" });
     margin-bottom: 1.5rem;
   }
 
-  .research-outline h2 {
+  .doc-outline h2 {
     font-size: var(--font-size-base);
     margin-bottom: 0.6rem;
   }
 
-  .research-outline__hint {
+  .doc-outline__hint {
     margin-bottom: 0.7rem;
     font-size: var(--font-size-xs);
     color: var(--color-ink-muted);
   }
 
-  .research-outline ol {
+  .doc-outline ol {
     margin: 0;
     padding-left: 1.2rem;
     display: grid;
     gap: 0.3rem;
   }
 
-  .research-outline li {
+  .doc-outline li {
     color: var(--color-ink-secondary);
   }
 
-  .research-outline li.is-active a {
+  .doc-outline li.is-active a {
     color: var(--color-accent-blue);
     font-weight: 600;
   }
 
-  .research-content :global(h2),
-  .research-content :global(h3),
-  .research-content :global(h4) {
+  .doc-content :global(h2),
+  .doc-content :global(h3),
+  .doc-content :global(h4) {
     margin-top: 1.8rem;
     margin-bottom: 0.7rem;
   }
 
-  .research-content :global(h2) {
+  .doc-content :global(h2) {
     font-size: clamp(1.5rem, 2.4vw, 1.95rem);
     line-height: 1.2;
   }
 
-  .research-content :global(h3) {
+  .doc-content :global(h3) {
     font-size: clamp(1.2rem, 1.8vw, 1.45rem);
     line-height: 1.28;
   }
 
-  .research-content :global(h4) {
+  .doc-content :global(h4) {
     font-size: clamp(1.05rem, 1.4vw, 1.18rem);
     line-height: 1.32;
   }
 
-  .research-content :global(p),
-  .research-content :global(ul),
-  .research-content :global(ol),
-  .research-content :global(blockquote) {
+  .doc-content :global(p),
+  .doc-content :global(ul),
+  .doc-content :global(ol),
+  .doc-content :global(blockquote) {
     margin-bottom: 1rem;
   }
 
-  .research-content :global(p) {
+  .doc-content :global(p) {
     font-size: 1.03rem;
     line-height: 1.72;
   }
 
-  .research-content :global(ul),
-  .research-content :global(ol) {
+  .doc-content :global(ul),
+  .doc-content :global(ol) {
     padding-left: 1.45rem;
   }
 
-  .research-content :global(ul) {
-    list-style-type: disc;
-  }
+  .doc-content :global(ul) { list-style-type: disc; }
+  .doc-content :global(ol) { list-style-type: decimal; }
+  .doc-content :global(ul ul) { list-style-type: circle; }
+  .doc-content :global(ul ul ul) { list-style-type: square; }
+  .doc-content :global(ol ol) { list-style-type: lower-alpha; }
 
-  .research-content :global(ol) {
-    list-style-type: decimal;
-  }
-
-  .research-content :global(ul ul) {
-    list-style-type: circle;
-  }
-
-  .research-content :global(ul ul ul) {
-    list-style-type: square;
-  }
-
-  .research-content :global(ol ol) {
-    list-style-type: lower-alpha;
-  }
-
-  .research-content :global(li) {
+  .doc-content :global(li) {
     margin-bottom: 0.45rem;
     line-height: 1.68;
   }
 
-  .research-content :global(li > ul),
-  .research-content :global(li > ol) {
+  .doc-content :global(li > ul),
+  .doc-content :global(li > ol) {
     margin-top: 0.4rem;
     margin-bottom: 0.4rem;
     padding-left: 1.2rem;
   }
 
-  .research-content :global(blockquote) {
+  .doc-content :global(blockquote) {
     border-left: 3px solid var(--color-border);
     padding-left: 0.9rem;
     color: var(--color-ink-secondary);
   }
 
-  .research-content :global(code) {
+  .doc-content :global(code) {
     font-family: var(--font-family-mono);
-    font-size: 0.9em;
-    background: #f0f0ed;
-    padding: 0.1rem 0.35rem;
+    font-size: 0.865em;
+    background: #e8e7e1;
+    color: var(--color-ink-primary);
+    padding: 0.15rem 0.42rem;
     border-radius: var(--radius-sm);
+    border: 1px solid #d4d3cc;
+    font-weight: var(--font-weight-medium);
   }
 
-  .research-content :global(pre) {
+  .doc-content :global(pre) {
     margin-bottom: 1rem;
     border: 1px solid var(--color-border);
     border-radius: var(--radius-md);
@@ -311,12 +300,14 @@ const dateFormatter = new Intl.DateTimeFormat("en-US", { dateStyle: "long" });
     overflow-x: auto;
   }
 
-  .research-content :global(pre code) {
+  .doc-content :global(pre code) {
     background: transparent;
     padding: 0;
+    border: none;
+    font-weight: var(--font-weight-normal);
   }
 
-  .research-pagination {
+  .doc-pagination {
     margin-top: 2rem;
     padding-top: 1rem;
     border-top: 1px solid var(--color-border);
@@ -325,23 +316,23 @@ const dateFormatter = new Intl.DateTimeFormat("en-US", { dateStyle: "long" });
     gap: 1rem;
   }
 
-  .research-pagination a {
+  .doc-pagination a {
     color: var(--color-accent-blue);
     font-weight: 500;
   }
 
   @media (min-width: 1024px) {
-    .research-body {
+    .doc-body {
       grid-template-columns: minmax(0, 56rem) 20rem;
       align-items: start;
       justify-content: center;
     }
 
-    .research-content {
+    .doc-content {
       max-width: 56rem;
     }
 
-    .research-outline {
+    .doc-outline {
       position: sticky;
       top: 6.5rem;
       width: 20rem;

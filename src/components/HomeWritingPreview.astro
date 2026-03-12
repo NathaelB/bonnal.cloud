@@ -2,11 +2,11 @@
 import { getCollection, type CollectionEntry } from "astro:content";
 
 type BlogEntry = CollectionEntry<"blog">;
-type ResearchChapterEntry = CollectionEntry<"research">;
-type ResearchDocumentEntry = CollectionEntry<"researchDocuments">;
+type ResearchChapterEntry = CollectionEntry<"documents">;
+type ResearchDocumentEntry = CollectionEntry<"documentIndex">;
 
 type WritingPreviewItem = {
-  kind: "article" | "research";
+  kind: "article" | "document";
   title: string;
   description: string;
   href: string;
@@ -21,9 +21,9 @@ const posts = (await getCollection("blog", ({ data }) => !data.draft)).map<Writi
   publishDate: post.data.publishDate,
 }));
 
-const researchChapters = await getCollection("research");
+const researchChapters = await getCollection("documents");
 const researchDocuments = await getCollection(
-  "researchDocuments",
+  "documentIndex",
   ({ data }) => !data.draft,
 );
 
@@ -51,10 +51,10 @@ const researchDocs: WritingPreviewItem[] = researchDocuments
     }
 
     return {
-      kind: "research",
+      kind: "document",
       title: doc.data.documentTitle,
       description: doc.data.documentDescription,
-      href: `/research/${doc.data.document}/${chapterSlug}/`,
+      href: `/documents/${doc.data.document}/${chapterSlug}/`,
       publishDate: doc.data.publishDate,
     } satisfies WritingPreviewItem;
   })
@@ -84,8 +84,8 @@ const dateFormatter = new Intl.DateTimeFormat("en-US", {
             <li class="home-writing__item">
               <a href={item.href} class="home-writing__link">
                 <p class="home-writing__meta">
-                  <span class:list={["home-writing__kind", item.kind === "research" && "home-writing__kind--research"]}>
-                    {item.kind === "research" ? "Research" : "Article"}
+                  <span class:list={["home-writing__kind", item.kind === "document" && "home-writing__kind--document"]}>
+                    {item.kind === "document" ? "Document" : "Article"}
                   </span>
                   {dateFormatter.format(item.publishDate)}
                 </p>
@@ -182,7 +182,7 @@ const dateFormatter = new Intl.DateTimeFormat("en-US", {
     color: var(--color-accent-blue);
   }
 
-  .home-writing__kind--research {
+  .home-writing__kind--document {
     color: #0f766e;
   }
 
