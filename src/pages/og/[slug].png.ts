@@ -1,7 +1,8 @@
 import type { APIRoute } from "astro";
 import { getCollection, type CollectionEntry } from "astro:content";
+import satori from "satori";
 import sharp from "sharp";
-import { ogFontStyle } from "@lib/og-font";
+import { ogFonts } from "@lib/og-font";
 
 export async function getStaticPaths() {
   const posts = await getCollection("blog", ({ data }) => !data.draft);
@@ -12,88 +13,48 @@ export async function getStaticPaths() {
 }
 
 type Props = { post: CollectionEntry<"blog"> };
+type Node = Parameters<typeof satori>[0];
 
-function escapeXml(str: string): string {
-  return str
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&apos;");
-}
+const flex = (style: Record<string, unknown>, children: Node | Node[]): Node => ({
+  type: "div",
+  props: { style: { display: "flex", ...style }, children },
+});
 
-function wrapText(text: string, maxWidth: number, fontSize: number, bold = false): string[] {
-  const charWidth = fontSize * (bold ? 0.58 : 0.52);
-  const charsPerLine = Math.floor(maxWidth / charWidth);
-  const words = text.split(" ");
-  const lines: string[] = [];
-  let line = "";
-
-  for (const word of words) {
-    const candidate = line ? `${line} ${word}` : word;
-    if (candidate.length > charsPerLine && line) {
-      lines.push(line);
-      line = word;
-    } else {
-      line = candidate;
-    }
-  }
-  if (line) lines.push(line);
-  return lines;
-}
+const text = (content: string, style: Record<string, unknown>): Node => ({
+  type: "div",
+  props: { style: { display: "flex", fontFamily: "Inter", ...style }, children: content },
+});
 
 export const GET: APIRoute = async ({ props }) => {
   const { post } = props as Props;
   const { title, description } = post.data;
 
-  const W = 1200;
-  const H = 630;
-  const PAD_X = 80;
-  const usableWidth = W - PAD_X * 2;
+  const fonts = await ogFonts();
 
-  const titleLines = wrapText(title, usableWidth, 56, true).slice(0, 2);
-  const descLines = wrapText(description, usableWidth, 24, false).slice(0, 3);
-
-  const titleFontSize = 56;
-  const titleLineHeight = 72;
-  const descFontSize = 24;
-  const descLineHeight = 38;
-
-  const titleStartY = 200;
-  const descStartY = titleStartY + titleLines.length * titleLineHeight + 36;
-  const accentBarHeight = titleLines.length * titleLineHeight - 8;
-
-  const titleSvg = titleLines
-    .map(
-      (line, i) =>
-        `<text x="${PAD_X + 20}" y="${titleStartY + i * titleLineHeight}" font-family="Inter, sans-serif" font-size="${titleFontSize}" font-weight="800" fill="#0f0f0e">${escapeXml(line)}</text>`
-    )
-    .join("\n  ");
-
-  const descSvg = descLines
-    .map(
-      (line, i) =>
-        `<text x="${PAD_X + 20}" y="${descStartY + i * descLineHeight}" font-family="Inter, sans-serif" font-size="${descFontSize}" font-weight="400" fill="#4a4a47">${escapeXml(line)}</text>`
-    )
-    .join("\n  ");
-
-  const fontStyle = await ogFontStyle();
-
-  const svg = `<svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg">
-  <defs><style>${fontStyle}</style></defs>
-
-  <rect width="${W}" height="${H}" fill="#f7f6f3"/>
-  <circle cx="1100" cy="80" r="220" fill="#1a56db" opacity="0.05"/>
-  <circle cx="1180" cy="${H - 60}" r="120" fill="#1a56db" opacity="0.04"/>
-  <circle cx="60" cy="${H - 40}" r="80" fill="#1a56db" opacity="0.03"/>
-  <rect x="0" y="${H - 4}" width="${W}" height="4" fill="#1a56db" opacity="0.15"/>
-  <rect x="${PAD_X}" y="${titleStartY - titleFontSize + 10}" width="4" height="${accentBarHeight}" rx="2" fill="#1a56db"/>
-
-  ${titleSvg}
-  ${descSvg}
-
-  <text x="${PAD_X + 20}" y="${H - 36}" font-family="Inter, sans-serif" font-size="17" font-weight="400" fill="#8a8a85">bonnal.cloud — Nathael Bonnal</text>
-</svg>`;
+  const svg = await satori(
+    flex(
+      { flexDirection: "column", width: "100%", height: "100%", backgroundColor: "#f7f6f3", position: "relative", overflow: "hidden" },
+      [
+        // Blobs
+        { type: "div", props: { style: { display: "flex", position: "absolute", top: -100, right: -60, width: 440, height: 440, borderRadius: "50%", backgroundColor: "#1a56db", opacity: 0.05 }, children: [] } },
+        { type: "div", props: { style: { display: "flex", position: "absolute", bottom: -60, right: -40, width: 240, height: 240, borderRadius: "50%", backgroundColor: "#1a56db", opacity: 0.04 }, children: [] } },
+        // Bottom accent line
+        { type: "div", props: { style: { display: "flex", position: "absolute", bottom: 0, left: 0, right: 0, height: 4, backgroundColor: "#1a56db", opacity: 0.15 }, children: [] } },
+        // Main content
+        flex({ flexDirection: "row", flex: 1, padding: "80px 80px 60px" }, [
+          // Accent bar
+          { type: "div", props: { style: { display: "flex", width: 4, borderRadius: 2, backgroundColor: "#1a56db", marginRight: 24, marginTop: 6, flexShrink: 0 }, children: [] } },
+          // Text column
+          flex({ flexDirection: "column", flex: 1 }, [
+            text(title, { fontSize: 56, fontWeight: 800, color: "#0f0f0e", lineHeight: 1.15, marginBottom: 24 }),
+            text(description, { fontSize: 24, fontWeight: 400, color: "#4a4a47", lineHeight: 1.5, flex: 1 }),
+            text("bonnal.cloud — Nathael Bonnal", { fontSize: 17, fontWeight: 400, color: "#8a8a85" }),
+          ]),
+        ]),
+      ]
+    ),
+    { width: 1200, height: 630, fonts }
+  );
 
   const png = await sharp(Buffer.from(svg)).png().toBuffer();
 

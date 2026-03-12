@@ -1,42 +1,90 @@
 import type { APIRoute } from "astro";
+import satori from "satori";
 import sharp from "sharp";
-import { ogFontStyle } from "@lib/og-font";
+import { ogFonts } from "@lib/og-font";
 
-const W = 1200;
-const H = 630;
-const PAD_X = 80;
+type Node = Parameters<typeof satori>[0];
+
+const flex = (style: Record<string, unknown>, children: Node | Node[]): Node => ({
+  type: "div",
+  props: {
+    style: { display: "flex", ...style },
+    children,
+  },
+});
+
+const text = (content: string, style: Record<string, unknown>): Node => ({
+  type: "div",
+  props: {
+    style: { display: "flex", fontFamily: "Inter", ...style },
+    children: content,
+  },
+});
+
+const blob = (size: number, top?: number, bottom?: number, left?: number, right?: number): Node => ({
+  type: "div",
+  props: {
+    style: {
+      display: "flex",
+      position: "absolute",
+      width: size,
+      height: size,
+      borderRadius: "50%",
+      backgroundColor: "#1a56db",
+      opacity: 0.05,
+      ...(top !== undefined && { top }),
+      ...(bottom !== undefined && { bottom }),
+      ...(left !== undefined && { left }),
+      ...(right !== undefined && { right }),
+    },
+    children: [],
+  },
+});
+
+const badge = (label: string): Node =>
+  text(label, {
+    padding: "8px 16px",
+    backgroundColor: "#e8e7e1",
+    border: "1px solid #d4d3cc",
+    borderRadius: 6,
+    fontSize: 14,
+    fontWeight: 400,
+    color: "#4a4a47",
+  });
 
 export const GET: APIRoute = async () => {
-  const fontStyle = await ogFontStyle();
+  const fonts = await ogFonts();
 
-  const svg = `<svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg">
-  <defs><style>${fontStyle}</style></defs>
-
-  <rect width="${W}" height="${H}" fill="#f7f6f3"/>
-  <circle cx="1100" cy="80" r="220" fill="#1a56db" opacity="0.05"/>
-  <circle cx="1180" cy="${H - 60}" r="120" fill="#1a56db" opacity="0.04"/>
-  <circle cx="60" cy="${H - 40}" r="80" fill="#1a56db" opacity="0.03"/>
-  <rect x="0" y="${H - 4}" width="${W}" height="4" fill="#1a56db" opacity="0.15"/>
-  <rect x="${PAD_X}" y="160" width="4" height="130" rx="2" fill="#1a56db"/>
-
-  <text x="${PAD_X + 20}" y="225" font-family="Inter, sans-serif" font-size="72" font-weight="800" fill="#0f0f0e">Nathael Bonnal</text>
-  <text x="${PAD_X + 20}" y="277" font-family="Inter, sans-serif" font-size="28" font-weight="400" fill="#1a56db">Software Engineer · Distributed Systems</text>
-  <text x="${PAD_X + 20}" y="345" font-family="Inter, sans-serif" font-size="22" font-weight="400" fill="#4a4a47">Cloud-native architectures, open-source, identity systems at scale.</text>
-
-  <rect x="${PAD_X + 20}" y="400" width="130" height="36" rx="6" fill="#e8e7e1" stroke="#d4d3cc" stroke-width="1"/>
-  <text x="${PAD_X + 85}" y="423" font-family="Inter, sans-serif" font-size="14" font-weight="400" fill="#4a4a47" text-anchor="middle">Kubernetes</text>
-
-  <rect x="${PAD_X + 168}" y="400" width="80" height="36" rx="6" fill="#e8e7e1" stroke="#d4d3cc" stroke-width="1"/>
-  <text x="${PAD_X + 208}" y="423" font-family="Inter, sans-serif" font-size="14" font-weight="400" fill="#4a4a47" text-anchor="middle">Rust</text>
-
-  <rect x="${PAD_X + 266}" y="400" width="62" height="36" rx="6" fill="#e8e7e1" stroke="#d4d3cc" stroke-width="1"/>
-  <text x="${PAD_X + 297}" y="423" font-family="Inter, sans-serif" font-size="14" font-weight="400" fill="#4a4a47" text-anchor="middle">IAM</text>
-
-  <rect x="${PAD_X + 346}" y="400" width="80" height="36" rx="6" fill="#e8e7e1" stroke="#d4d3cc" stroke-width="1"/>
-  <text x="${PAD_X + 386}" y="423" font-family="Inter, sans-serif" font-size="14" font-weight="400" fill="#4a4a47" text-anchor="middle">OIDC</text>
-
-  <text x="${PAD_X + 20}" y="${H - 36}" font-family="Inter, sans-serif" font-size="17" font-weight="400" fill="#8a8a85">bonnal.cloud</text>
-</svg>`;
+  const svg = await satori(
+    flex(
+      { flexDirection: "column", width: "100%", height: "100%", backgroundColor: "#f7f6f3", position: "relative", overflow: "hidden" },
+      [
+        blob(440, -100, undefined, undefined, -60),
+        blob(240, undefined, -60, undefined, -40),
+        // Bottom accent line
+        { type: "div", props: { style: { display: "flex", position: "absolute", bottom: 0, left: 0, right: 0, height: 4, backgroundColor: "#1a56db", opacity: 0.15 }, children: [] } },
+        // Main content
+        flex({ flexDirection: "row", flex: 1, padding: "80px 80px 60px" }, [
+          // Accent bar
+          { type: "div", props: { style: { display: "flex", width: 4, borderRadius: 2, backgroundColor: "#1a56db", marginRight: 24, marginTop: 6, flexShrink: 0 }, children: [] } },
+          // Text column
+          flex({ flexDirection: "column", flex: 1 }, [
+            text("Nathael Bonnal", { fontSize: 72, fontWeight: 800, color: "#0f0f0e", marginBottom: 16, lineHeight: 1.1 }),
+            text("Software Engineer · Distributed Systems", { fontSize: 28, fontWeight: 400, color: "#1a56db", marginBottom: 20 }),
+            text("Cloud-native architectures, open-source, identity systems at scale.", { fontSize: 22, fontWeight: 400, color: "#4a4a47", flex: 1 }),
+            flex({ flexDirection: "row", gap: 10, marginBottom: 32 }, [
+              badge("Kubernetes"),
+              badge("Rust"),
+              badge("IAM"),
+              badge("OIDC"),
+            ]),
+            text("bonnal.cloud", { fontSize: 17, fontWeight: 400, color: "#8a8a85" }),
+          ]),
+        ]),
+      ]
+    ),
+    { width: 1200, height: 630, fonts }
+  );
 
   const png = await sharp(Buffer.from(svg)).png().toBuffer();
 

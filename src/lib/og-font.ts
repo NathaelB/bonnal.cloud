@@ -1,13 +1,10 @@
 /**
- * Fetches Inter font files from Bunny CDN (already used by the site) and
- * caches them in memory for the duration of the build.
- *
- * librsvg (used by sharp) supports @font-face with base64 WOFF data URIs,
- * which avoids any dependency on fonts installed on the build/deploy server.
+ * Fetches Inter font files from Bunny CDN and caches them for the build.
+ * Returns ArrayBuffer for use with satori.
  */
-const cache = new Map<string, string>();
+const cache = new Map<string, ArrayBuffer>();
 
-async function fetchBase64(weight: 400 | 700 | 800): Promise<string> {
+async function fetchFont(weight: 400 | 800): Promise<ArrayBuffer> {
   const key = String(weight);
   if (cache.has(key)) return cache.get(key)!;
 
@@ -15,27 +12,15 @@ async function fetchBase64(weight: 400 | 700 | 800): Promise<string> {
   const res = await fetch(url);
   if (!res.ok) throw new Error(`Failed to fetch Inter ${weight}: ${res.status}`);
 
-  const b64 = Buffer.from(await res.arrayBuffer()).toString("base64");
-  cache.set(key, b64);
-  return b64;
+  const buf = await res.arrayBuffer();
+  cache.set(key, buf);
+  return buf;
 }
 
-export async function ogFontStyle(): Promise<string> {
-  const [regular, bold] = await Promise.all([
-    fetchBase64(400),
-    fetchBase64(800),
-  ]);
-
-  return `
-    @font-face {
-      font-family: 'Inter';
-      font-weight: 400;
-      src: url('data:font/woff;base64,${regular}') format('woff');
-    }
-    @font-face {
-      font-family: 'Inter';
-      font-weight: 800;
-      src: url('data:font/woff;base64,${bold}') format('woff');
-    }
-  `;
+export async function ogFonts() {
+  const [regular, bold] = await Promise.all([fetchFont(400), fetchFont(800)]);
+  return [
+    { name: "Inter", data: regular, weight: 400 as const, style: "normal" as const },
+    { name: "Inter", data: bold,    weight: 800 as const, style: "normal" as const },
+  ];
 }
