@@ -11,6 +11,8 @@ type WritingPreviewItem = {
   description: string;
   href: string;
   publishDate: Date;
+  tags: string[];
+  ogImage: string | null;
 };
 
 const posts = (await getCollection("blog", ({ data }) => !data.draft)).map<WritingPreviewItem>((post: BlogEntry) => ({
@@ -19,6 +21,8 @@ const posts = (await getCollection("blog", ({ data }) => !data.draft)).map<Writi
   description: post.data.description,
   href: `/blog/${post.slug}/`,
   publishDate: post.data.publishDate,
+  tags: post.data.tags,
+  ogImage: `/og/${post.slug}.png`,
 }));
 
 const researchChapters = await getCollection("documents");
@@ -56,6 +60,8 @@ const researchDocs: WritingPreviewItem[] = researchDocuments
       description: doc.data.documentDescription,
       href: `/documents/${doc.data.document}/${chapterSlug}/`,
       publishDate: doc.data.publishDate,
+      tags: doc.data.tags,
+      ogImage: null,
     } satisfies WritingPreviewItem;
   })
   .filter((doc): doc is WritingPreviewItem => doc !== null);
@@ -83,14 +89,26 @@ const dateFormatter = new Intl.DateTimeFormat("en-US", {
           {items.map((item) => (
             <li class="home-writing__item">
               <a href={item.href} class="home-writing__link">
-                <p class="home-writing__meta">
-                  <span class:list={["home-writing__kind", item.kind === "document" && "home-writing__kind--document"]}>
-                    {item.kind === "document" ? "Document" : "Article"}
-                  </span>
-                  {dateFormatter.format(item.publishDate)}
-                </p>
-                <h3>{item.title}</h3>
-                <p>{item.description}</p>
+                <div class="home-writing__banner" aria-hidden="true">
+                  {item.ogImage ? (
+                    <img src={item.ogImage} alt="" loading="lazy" decoding="async" />
+                  ) : (
+                    <div class="home-writing__banner-placeholder" />
+                  )}
+                </div>
+                <div class="home-writing__info">
+                  <p class="home-writing__meta">
+                    <span class:list={["home-writing__kind", item.kind === "research" && "home-writing__kind--research"]}>
+                      {item.kind === "research" ? "Research" : "Article"}
+                    </span>
+                    {item.tags.slice(0, 2).map((tag) => (
+                      <span class="home-writing__tag">{tag}</span>
+                    ))}
+                    <span class="home-writing__date">{dateFormatter.format(item.publishDate)}</span>
+                  </p>
+                  <h3 class="home-writing__title">{item.title}</h3>
+                  <p class="home-writing__desc">{item.description}</p>
+                </div>
               </a>
             </li>
           ))}
@@ -154,25 +172,72 @@ const dateFormatter = new Intl.DateTimeFormat("en-US", {
     }
   }
 
+  /* Card */
   .home-writing__item {
-    border: 1px solid var(--color-border);
-    background: var(--color-surface);
     border-radius: var(--radius-md);
+    overflow: hidden;
+    position: relative;
+    height: 380px;
+    border: 1px solid var(--color-border);
   }
 
   .home-writing__link {
     display: block;
-    padding: 1rem;
+    height: 100%;
+    position: relative;
+    text-decoration: none;
   }
 
-  .home-writing__meta {
-    color: var(--color-ink-muted);
-    font-size: var(--font-size-xs);
-    margin-bottom: 0.4rem;
+  /* Banner (OG image) */
+  .home-writing__banner {
+    position: absolute;
+    inset: 0;
+  }
+
+  .home-writing__banner img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: top left;
+    display: block;
+  }
+
+  .home-writing__banner-placeholder {
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, #1e3a5f 0%, #2563eb 50%, #7c3aed 100%);
+  }
+
+  /* Sliding info panel */
+  .home-writing__info {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 100%;
+    background: var(--color-surface);
+    border-radius: var(--radius-md);
+    padding: 1.1rem 1.25rem 1.25rem;
+    transform: translateY(57%);
+    transition: transform 0.38s cubic-bezier(0.4, 0, 0.2, 1);
     display: flex;
+    flex-direction: column;
     gap: 0.5rem;
+  }
+
+  .home-writing__item:hover .home-writing__info {
+    transform: translateY(0);
+  }
+
+  /* Meta row */
+  .home-writing__meta {
+    display: flex;
     align-items: center;
     flex-wrap: wrap;
+    gap: 0.35rem 0.5rem;
+    font-size: var(--font-size-xs);
+    color: var(--color-ink-muted);
+    margin: 0;
   }
 
   .home-writing__kind {
@@ -186,13 +251,44 @@ const dateFormatter = new Intl.DateTimeFormat("en-US", {
     color: #0f766e;
   }
 
-  .home-writing__link h3 {
-    font-size: var(--font-size-lg);
-    line-height: var(--line-height-snug);
+  .home-writing__tag {
+    border: 1px solid var(--color-border);
+    border-radius: 999px;
+    padding: 0.06rem 0.45rem;
+    color: var(--color-ink-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    font-size: 0.65rem;
+    font-weight: 500;
   }
 
-  .home-writing__link p {
-    margin-top: 0.5rem;
+  .home-writing__date {
+    margin-left: auto;
+  }
+
+  /* Title */
+  .home-writing__title {
+    font-size: var(--font-size-lg);
+    line-height: var(--line-height-snug);
+    margin: 0;
+  }
+
+  /* Description — hidden by default, fades in on hover */
+  .home-writing__desc {
+    font-size: var(--font-size-sm);
+    color: var(--color-ink-secondary);
+    line-height: var(--line-height-relaxed);
+    margin: 0;
+    opacity: 0;
+    transition: opacity 0.2s ease 0.18s;
+    display: -webkit-box;
+    -webkit-line-clamp: 4;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .home-writing__item:hover .home-writing__desc {
+    opacity: 1;
   }
 
   .home-writing__empty {
