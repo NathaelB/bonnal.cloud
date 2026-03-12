@@ -18,7 +18,7 @@ interface Props extends SiteMeta {}
 const {
   title = SITE.title,
   description = SITE.description,
-  ogImage = "/banner.jpg",
+  ogImage = "/og/banner.png",
   noindex = false,
   canonical,
 } = Astro.props;
@@ -56,7 +56,7 @@ const jsonLd = {
 <meta property="og:title" content={title} />
 <meta property="og:description" content={description} />
 <meta property="og:image" content={ogImageAbsolute} />
-<meta property="og:image:type" content="image/jpeg" />
+<meta property="og:image:type" content="image/png" />
 <meta property="og:image:width" content="1200" />
 <meta property="og:image:height" content="630" />
 <meta property="og:image:alt" content="Nathael Bonnal — Software Engineer, Distributed Systems" />

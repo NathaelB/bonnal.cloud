@@ -27,6 +27,7 @@ const dateFormatter = new Intl.DateTimeFormat("en-US", {
   title={`${post.data.title} — Nathael B.`}
   description={post.data.description}
   canonical={`/blog/${post.slug}/`}
+  ogImage={`/og/${post.slug}.png`}
 >
   <main id="main-content" class="post-page">
     <article class="post container section" data-animate>
@@ -93,7 +94,7 @@ const dateFormatter = new Intl.DateTimeFormat("en-US", {
     font-weight: 500;
   }
 
-  .post-header {
+.post-header {
     margin-bottom: 2rem;
   }
 

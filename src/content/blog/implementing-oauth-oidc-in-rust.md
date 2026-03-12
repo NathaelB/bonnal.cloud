@@ -1,7 +1,7 @@
 ---
 title: "Implementing OAuth2 & OIDC in Rust - What I learned bulding FerrisKey"
 description: "A deep dive into the implementation of OAuth2 and OpenID Connect in Rust, sharing insights and lessons learned from building FerrisKey, an open-source IAM system."
-publishDate: 2026-03-12
+publishDate: 2026-03-11
 links:
   - label: "FerrisKey GitHub"
     href: "https://github.com/ferriskey/ferriskey"
