@@ -3,7 +3,7 @@ replicaCount: 1
 image:
   repository: ghcr.io/nathaelb/bonnal-cloud
   pullPolicy: IfNotPresent
-  tag: "3ed1dfa"
+  tag: "79a2768"
 
 imagePullSecrets: []
 
