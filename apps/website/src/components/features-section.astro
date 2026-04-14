@@ -1,0 +1,129 @@
+---
+import { Icon } from "@iconify/react";
+
+const projects = [
+  {
+    logo: "/logos/ferriskey.png",
+    titleKey: "projects.ferriskey.title",
+    descKey: "projects.ferriskey.description",
+    title: "FerrisKey",
+    description: "An open source IAM platform built in Rust to explore identity, policy and developer-first operations.",
+    tags: ["Rust", "IAM", "OIDC", "Keycloak"],
+    href: "https://github.com/FerrisKey/FerrisKey",
+  },
+  {
+    icon: "mdi:message-text-lock-outline",
+    titleKey: "projects.ferriscord.title",
+    descKey: "projects.ferriscord.description",
+    title: "Ferriscord",
+    description: "A FerrisLabs project focused on realtime collaboration foundations, protocol design and reliable services.",
+    tags: ["Rust", "Realtime", "ScyllaDB", "Kafka"],
+    href: "https://github.com/FerrisLabs/Ferriscord",
+  },
+  {
+    icon: "mdi:email-fast-outline",
+    titleKey: "projects.ferrisletter.title",
+    descKey: "projects.ferrisletter.description",
+    title: "Ferrisletter",
+    description: "A FerrisLabs product for messaging and newsletter workflows with clean delivery and platform boundaries.",
+    tags: ["Postgres", "Architecture", "Open source"],
+    href: "https://github.com/FerrisLabs/Ferrisletter",
+  },
+];
+---
+
+<section id="projects" class="relative w-full py-16 sm:py-24 lg:py-28">
+  <div class="relative w-full max-w-6xl mx-auto px-5">
+    <div class="mb-12 max-w-3xl">
+      <p
+        class="text-sm font-semibold text-primary uppercase tracking-wide mb-3"
+        data-t="features.label"
+      >
+        Projects
+      </p>
+      <h2 class="text-3xl font-semibold text-foreground sm:text-4xl" data-t="features.title">
+        Open source products, not demo code
+      </h2>
+      <p
+        class="mt-4 text-lg text-muted-foreground text-pretty"
+        data-t="features.description"
+      >
+        FerrisKey and FerrisLabs are the places where I turn architecture decisions into concrete software.
+      </p>
+    </div>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+      {
+        projects.map((project) => (
+          <a
+            href={project.href}
+            target="_blank"
+            rel="noopener noreferrer"
+            class="group flex flex-col gap-5 rounded-lg border bg-background p-6 transition-colors hover:border-primary/50"
+          >
+            <div class="flex items-center justify-between gap-4">
+              <div class="flex size-14 items-center justify-center rounded-lg border bg-muted">
+                {project.logo ? (
+                  <img src={project.logo} alt="" class="size-9 object-contain" loading="lazy" />
+                ) : (
+                  <Icon
+                    icon={project.icon}
+                    className="size-7 text-primary"
+                    client:load
+                  />
+                )}
+              </div>
+              <Icon
+                icon="mdi:arrow-top-right"
+                className="size-5 text-muted-foreground transition-colors group-hover:text-primary"
+                client:load
+              />
+            </div>
+            <div>
+              <h3 class="text-xl font-semibold text-foreground" data-t={project.titleKey}>
+                {project.title}
+              </h3>
+              <p class="text-sm text-muted-foreground mt-2 leading-relaxed" data-t={project.descKey}>
+                {project.description}
+              </p>
+            </div>
+            <div class="mt-auto flex flex-wrap gap-2">
+              {project.tags.map((tag) => (
+                <span class="rounded-md border bg-muted px-2.5 py-1 text-xs text-muted-foreground">
+                  {tag}
+                </span>
+              ))}
+            </div>
+          </a>
+        ))
+      }
+    </div>
+
+    <div class="mt-10 rounded-lg border bg-muted/50 p-6">
+      <div class="flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
+        <div>
+          <h3 class="text-lg font-semibold text-foreground" data-t="projects.opensource.title">
+            Lead project, maintainer mindset
+          </h3>
+          <p class="mt-2 max-w-2xl text-sm leading-relaxed text-muted-foreground" data-t="projects.opensource.description">
+            I care about public roadmaps, readable contribution paths, pragmatic governance and long-term maintainability.
+          </p>
+        </div>
+        <div class="grid grid-cols-3 gap-3 text-center">
+          <div class="rounded-lg border bg-background px-4 py-3">
+            <p class="text-lg font-semibold">IAM</p>
+            <p class="text-xs text-muted-foreground">identity</p>
+          </div>
+          <div class="rounded-lg border bg-background px-4 py-3">
+            <p class="text-lg font-semibold">Rust</p>
+            <p class="text-xs text-muted-foreground">systems</p>
+          </div>
+          <div class="rounded-lg border bg-background px-4 py-3">
+            <p class="text-lg font-semibold">OSS</p>
+            <p class="text-xs text-muted-foreground">lead</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

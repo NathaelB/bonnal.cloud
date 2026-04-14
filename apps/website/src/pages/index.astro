@@ -1,0 +1,31 @@
+---
+import Base from '../layouts/base.astro'
+import { WebsiteNavbar } from '../components/website-navbar'
+import HeroSection from '../components/hero-section.astro'
+import FeaturesSection from '../components/features-section.astro'
+import HighlightsSection from '../components/highlights-section.astro'
+import CtaSection from '../components/cta-section.astro'
+import LatestArticlesSection from '../components/latest-articles-section.astro'
+import { Footer } from '@explainer/ui'
+import { siteConfig } from '../config'
+
+const appUrlOverrides = {
+  website: import.meta.env.PUBLIC_WEBSITE_URL,
+  docs: import.meta.env.PUBLIC_DOCS_URL,
+  blog: import.meta.env.PUBLIC_BLOG_URL,
+}
+---
+
+<Base title="Nathael Bonnal" description="Portfolio of Nathael Bonnal, Rust, IAM, Kubernetes and distributed architecture engineer." thumbnail="/nathael.jpg">
+  <WebsiteNavbar appUrlOverrides={appUrlOverrides} client:load transition:persist />
+
+  <HeroSection />
+  <FeaturesSection />
+  <HighlightsSection />
+  <LatestArticlesSection />
+  <CtaSection />
+
+  <div class="mx-auto max-w-6xl px-6">
+    <Footer config={siteConfig} locale="en" appUrlOverrides={appUrlOverrides} client:load />
+  </div>
+</Base>

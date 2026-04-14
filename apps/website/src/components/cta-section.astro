@@ -1,0 +1,42 @@
+---
+import { Icon } from "@iconify/react";
+import { Button } from "@explainer/ui";
+---
+
+<div class="w-full max-w-6xl mx-auto px-5 py-16 sm:py-24 lg:py-32">
+  <div
+    id="contact"
+    class="relative overflow-hidden border rounded-lg bg-brand-blue/30 px-8 py-16 sm:px-16 sm:py-20 text-center"
+  >
+    <h2 class="text-3xl font-semibold text-foreground sm:text-4xl" data-t="cta.title">
+      Let us build platforms that are simpler to operate
+    </h2>
+    <p class="mt-4 text-lg text-muted-foreground max-w-xl mx-auto text-balance" data-t="cta.description">
+      I am interested in Rust, IAM, Kubernetes, authorization policy and ambitious open source projects.
+    </p>
+    <div class="mt-8 flex flex-wrap justify-center gap-3">
+      <Button size="lg" className="cursor-pointer" client:load>
+        <a href="https://github.com/LeadcodeDev" class="flex gap-2" target="_blank" rel="noopener noreferrer">
+          <Icon
+            icon="mdi:github"
+            aria-hidden="true"
+            className="size-5"
+            client:load
+          />
+          <span data-t="cta.action">Follow me on GitHub</span>
+        </a>
+      </Button>
+      <Button variant="outline" size="lg" className="cursor-pointer" client:load>
+        <a href="#blog" class="flex gap-2" rel="noopener noreferrer">
+          <span data-t="cta.blog">Read my articles</span>
+          <Icon
+            icon="mdi:arrow-right"
+            aria-hidden="true"
+            className="size-5"
+            client:load
+          />
+        </a>
+      </Button>
+    </div>
+  </div>
+</div>

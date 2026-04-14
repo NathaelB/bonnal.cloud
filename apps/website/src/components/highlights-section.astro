@@ -1,0 +1,92 @@
+---
+import { Icon } from "@iconify/react";
+
+const highlights = [
+  { icon: "mdi:language-rust", titleKey: "highlights.rust.title", descKey: "highlights.rust.description", title: "Rust and backend engineering", description: "APIs, services and infrastructure code with strong ownership of correctness, ergonomics and operational behaviour.", span: 3 },
+  { icon: "mdi:shield-key-outline", titleKey: "highlights.iam.title", descKey: "highlights.iam.description", title: "IAM and authorization", description: "OIDC, Keycloak, FerrisKey, policy models, delegated authorization and secure product boundaries.", span: 3 },
+  { icon: "mdi:kubernetes", titleKey: "highlights.platform.title", descKey: "highlights.platform.description", title: "Kubernetes, OPA, AuthZen, MCP", description: "Platform primitives for deployment, policy enforcement, AI tool access and service-to-service governance.", span: 2 },
+  { icon: "mdi:transit-connection-variant", titleKey: "highlights.distributed.title", descKey: "highlights.distributed.description", title: "Distributed architecture", description: "Kafka, Saga Pattern, event flows, consistency tradeoffs and systems that stay explainable under failure.", span: 2 },
+  { icon: "mdi:database-cog-outline", titleKey: "highlights.data.title", descKey: "highlights.data.description", title: "Postgres and ScyllaDB", description: "Data modelling, query paths and persistence choices for identity, messaging and high-throughput services.", span: 2 },
+];
+
+const logos = [
+  { name: "Rust", src: "/logos/rust.svg" },
+  { name: "Kubernetes", src: "/logos/kubernetes.svg" },
+  { name: "OPA", src: "/logos/opa.svg" },
+  { name: "Kafka", src: "/logos/kafka.svg" },
+  { name: "Postgres", src: "/logos/postgres.svg" },
+  { name: "Keycloak", src: "/logos/keycloak.svg" },
+  { name: "ScyllaDB", src: "/logos/scylladb.svg" },
+  { name: "Prometheus", src: "/logos/prometheus.svg" },
+  { name: "Grafana", src: "/logos/grafana.svg" },
+  { name: "RabbitMQ", src: "/logos/rabbitmq.svg" },
+];
+---
+
+<section id="expertise" class="relative w-full bg-muted/50 py-16 sm:py-24 lg:py-28">
+  <div class="relative w-full max-w-6xl mx-auto px-5">
+    <div class="mb-12 max-w-3xl">
+      <p
+        class="text-sm font-semibold text-primary uppercase tracking-wide mb-3"
+        data-t="highlights.label"
+      >
+        Expertise
+      </p>
+      <h2 class="text-3xl font-semibold text-foreground sm:text-4xl" data-t="highlights.title">
+        From identity to distributed platforms
+      </h2>
+      <p
+        class="mt-4 text-lg text-muted-foreground text-pretty"
+        data-t="highlights.description"
+      >
+        I focus on the parts of a system where product design, security constraints and operational reality meet.
+      </p>
+    </div>
+
+    <div class="grid grid-cols-1 sm:grid-cols-6 gap-5">
+      {
+        highlights.map((item) => (
+          <div
+            class:list={[
+              "border rounded-lg bg-background",
+              item.span === 3 ? "sm:col-span-3" : "sm:col-span-2",
+            ]}
+          >
+            <div class="p-6 flex flex-col gap-5 h-full">
+              <div class="flex items-center justify-center size-12 rounded-lg bg-primary/10">
+                <Icon
+                  icon={item.icon}
+                  className="size-6 text-primary"
+                  client:load
+                />
+              </div>
+              <div>
+                <h3 class="text-xl font-semibold text-foreground" data-t={item.titleKey}>
+                  {item.title}
+                </h3>
+                <p class="text-sm text-muted-foreground mt-2 leading-relaxed" data-t={item.descKey}>
+                  {item.description}
+                </p>
+              </div>
+            </div>
+          </div>
+        ))
+      }
+    </div>
+
+    <div class="mt-10 grid grid-cols-2 gap-3 sm:grid-cols-5">
+      {logos.map((logo) => (
+        <div class="flex h-28 items-center justify-center rounded-lg border bg-background p-4">
+          <div class="flex h-18 w-full items-center justify-center rounded-md bg-white px-4 py-3">
+            <img
+              src={logo.src}
+              alt={logo.name}
+              class="max-h-full max-w-32 object-contain"
+              loading="lazy"
+            />
+          </div>
+        </div>
+      ))}
+    </div>
+  </div>
+</section>

@@ -1,0 +1,25 @@
+@import '@explainer/ui/styles/globals.css';
+
+@source "../../../../packages/ui/src";
+
+@theme {
+  --color-brand-blue: #000091;
+  --color-primary: #000091;
+  --color-primary-foreground: oklch(0.985 0 0);
+  --color-ring: #7f92ff;
+}
+
+.dark {
+  --color-background: #080914;
+  --color-foreground: oklch(0.97 0 0);
+  --color-card: #101226;
+  --color-muted: #11142a;
+  --color-muted-foreground: oklch(0.78 0.025 270);
+  --color-border: #252952;
+  --color-input: #252952;
+  --color-accent: #15183a;
+  --color-accent-foreground: oklch(0.97 0 0);
+  --color-primary: #7f92ff;
+  --color-primary-foreground: #080914;
+  --color-ring: #7f92ff;
+}
