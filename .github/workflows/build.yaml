@@ -40,7 +40,6 @@ jobs:
             platform: linux/arm64
         target:
           - website
-          - docs
           - blog
     steps:
       - name: checkout
@@ -117,7 +116,6 @@ jobs:
       matrix:
         target:
           - website
-          - docs
           - blog
     steps:
       - name: set up buildx
@@ -147,10 +145,40 @@ jobs:
             type=semver,pattern={{major}}.{{minor}}
             type=semver,pattern={{major}}
             type=ref,event=pr
-            type=sha
+            type=sha,format=short,prefix=
             type=raw,value=latest,enable={{is_default_branch}}
 
       - name: push manifest
         working-directory: ${{ runner.temp }}/digests
         run: |
           docker buildx imagetools create $(jq -cr '.tags | map("-t " + .) | join(" ")' <<< "$DOCKER_METADATA_OUTPUT_JSON") $(printf 'ghcr.io/nathaelb/bonnal-cloud-${{ matrix.target }}@sha256:%s ' *)
+
+  update-helm-values:
+    if: github.ref_name == github.event.repository.default_branch && (github.event_name == 'push' || inputs.push)
+    needs:
+      - push-manifest
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout
+        uses: actions/checkout@v5
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: update shared image tag
+        run: |
+          tag="$(git rev-parse --short=7 HEAD)"
+          perl -0pi -e 's/(^image:\n(?:  .*\n)*?  tag:\s*)["'\'']?[^"'\''\n]+["'\'']?/${1}"'"$tag"'"/m' helm/values.yaml
+          git diff -- helm/values.yaml
+
+      - name: commit updated values
+        run: |
+          if git diff --quiet -- helm/values.yaml; then
+            echo "helm/values.yaml already uses the current image tag"
+            exit 0
+          fi
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add helm/values.yaml
+          git commit -m "chore: update deployed image tag [skip ci]"
+          git push
