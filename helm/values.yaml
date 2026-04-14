@@ -1,7 +1,7 @@
 image:
   pullPolicy: IfNotPresent
   # Shared by website and blog images.
-  tag: "603a9ca"
+  tag: "2e8fad1"
 
 imagePullSecrets: []
 
