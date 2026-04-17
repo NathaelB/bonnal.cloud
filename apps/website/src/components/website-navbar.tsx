@@ -6,7 +6,7 @@ interface WebsiteNavbarProps {
 }
 
 export function WebsiteNavbar({ appUrlOverrides }: WebsiteNavbarProps) {
-  const appLinks = getAppLinks('website', appUrlOverrides).filter((link) => link.id !== 'docs')
+  const appLinks = getAppLinks('website', appUrlOverrides)
 
   const websiteLinks: NavbarLink[] = [
     { label: 'Projects', href: '#projects' },
@@ -17,9 +17,9 @@ export function WebsiteNavbar({ appUrlOverrides }: WebsiteNavbarProps) {
   return (
     <Navbar
       brand="Nathael Bonnal"
+      brandIcon=""
       currentApp="website"
       appUrlOverrides={appUrlOverrides}
-      excludedAppIds={['docs']}
       links={websiteLinks}
       showThemeToggle={false}
       leftSlot={

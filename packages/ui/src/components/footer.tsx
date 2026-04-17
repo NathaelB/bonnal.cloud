@@ -29,8 +29,6 @@ export function Footer({ config = defaultConfig, locale: localeProp, appUrlOverr
     }
   }, [localeProp, config])
 
-  const docsUrl = (appUrlOverrides?.docs ?? '').replace(/\/$/, '')
-  const blogUrl = appUrlOverrides?.blog ?? '/'
   const { footer, name } = config
 
   const copyrightText = t(locale, footer.copyright).replace('{year}', String(new Date().getFullYear()))
@@ -54,7 +52,11 @@ export function Footer({ config = defaultConfig, locale: localeProp, appUrlOverr
           <ul className="space-y-2">
             {footer.links.documentation.map((link) => (
               <li key={link.href}>
-                <a href={`${docsUrl}${resolveHref(link.href, locale)}`} className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+                <a
+                  href={resolveHref(link.href, locale)}
+                  className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+                  {...(link.external ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
+                >
                   {t(locale, link.label)}
                 </a>
               </li>
@@ -67,7 +69,7 @@ export function Footer({ config = defaultConfig, locale: localeProp, appUrlOverr
             <h4 className="text-sm font-semibold text-foreground mb-3">{t(locale, footer.columns.resources)}</h4>
             <ul className="space-y-2">
               {footer.links.resources.map((link) => {
-                const href = link.appId === 'blog' ? blogUrl : link.href
+                const href = link.appId ? (appUrlOverrides?.[link.appId] ?? link.href) : link.href
                 return (
                   <li key={link.label}>
                     <a

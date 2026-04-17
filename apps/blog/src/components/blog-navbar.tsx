@@ -38,6 +38,8 @@ export function BlogNavbar({ activePath, appUrlOverrides, locale: initialLocale,
 
   return (
     <Navbar
+      brand="Nathael Bonnal"
+      brandIcon=""
       currentApp="blog"
       appUrlOverrides={appUrlOverrides}
       brandHref={appUrlOverrides?.website ?? '/'}
