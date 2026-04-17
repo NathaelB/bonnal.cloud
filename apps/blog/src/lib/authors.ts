@@ -6,12 +6,12 @@ export interface Author {
 }
 
 export const authors: Record<string, Author> = {
-  leadcode_dev: {
-    name: 'Baptiste Parmantier',
-    title: 'Creator of Explainer',
-    avatar: 'https://avatars.githubusercontent.com/u/8946317?v=4',
-    href: 'https://github.com/LeadcodeDev',
-  },
+  nathael: {
+    name: 'Nathael',
+    title: 'Software Engineer',
+    avatar: 'https://avatars.githubusercontent.com/u/64804778?v=4',
+    href: 'https://github.com/nathaelb',
+  }
 }
 
 export function getAuthor(id: string): Author | undefined {

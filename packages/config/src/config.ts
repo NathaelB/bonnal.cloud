@@ -1,25 +1,17 @@
 import type { SiteConfig } from './contracts'
 
 export const defaultConfig: SiteConfig = {
-  name: 'Explainer',
-  titleTemplate: '%s — Explainer',
+  name: 'Nathael',
+  titleTemplate: '%s — Nathael',
   favicon: '/favicon.svg',
   logo: '/logo.svg',
   thumbnail: '/thumbnail.png',
   twitterCard: 'summary_large_image',
   ogType: 'website',
   github: 'https://github.com/LeadcodeDev/explainer_v2',
-  sponsors: [
-    {
-      id: 'mineral',
-      name: 'Mineral',
-      href: 'https://mineral-dart.dev/',
-      logoUrl: 'https://mineral-dart.dev/logo.svg',
-      tier: 'silver',
-    },
-  ],
+  sponsors: [],
   defaultLocale: 'en',
-  locales: ['en', 'fr'],
+  locales: ['en'],
   footer: {
     description: 'footer.description',
     columns: {

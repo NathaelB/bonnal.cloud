@@ -5,7 +5,7 @@ export const siteConfig = defineConfig({
   titleTemplate: '%s',
   logo: '/logo.svg',
   thumbnail: '/nathael.jpg',
-  github: 'https://github.com/LeadcodeDev',
+  github: 'https://github.com/nathaelb',
   defaultLocale: 'en',
   locales: ['en'],
   footer: {
@@ -26,7 +26,7 @@ export const siteConfig = defineConfig({
       ],
       resources: [
         { label: 'Blog', href: '', appId: 'blog' },
-        { label: 'GitHub', href: 'https://github.com/LeadcodeDev', external: true },
+        { label: 'GitHub', href: 'https://github.com/nathaelb', external: true },
       ],
       community: [
         { label: 'Open source', href: 'https://github.com/FerrisLabs', external: true },

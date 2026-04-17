@@ -29,9 +29,9 @@ COPY --from=deps /app/apps/blog/node_modules ./apps/blog/node_modules
 COPY --from=deps /app/apps/website/node_modules ./apps/website/node_modules
 COPY . .
 
-ENV PUBLIC_WEBSITE_URL=https://ferriskey.rs
-ENV PUBLIC_DOCS_URL=https://docs.ferriskey.rs
-ENV PUBLIC_BLOG_URL=https://blog.ferriskey.rs
+ENV PUBLIC_WEBSITE_URL=https://bonnal.cloud
+ENV PUBLIC_DOCS_URL=https://docs.bonnal.cloud
+ENV PUBLIC_BLOG_URL=https://blog.bonnal.cloud
 
 RUN pnpm build
 

@@ -54,18 +54,17 @@ export function MobileMenu({
       {appLinks && appLinks.length > 0 && (
         <div className="mt-4 pt-4 border-t">
           <span className="px-3 py-1 text-xs font-medium text-muted-foreground uppercase tracking-wider">
-            Explainer
+            Nathael
           </span>
           <nav className="flex flex-col gap-1 mt-1">
             {appLinks.map((link) => (
               <a
                 key={link.id}
                 href={link.href}
-                className={`rounded-md px-3 py-2 text-sm font-medium transition-colors ${
-                  link.current
+                className={`rounded-md px-3 py-2 text-sm font-medium transition-colors ${link.current
                     ? 'bg-secondary text-foreground'
                     : 'text-muted-foreground hover:text-foreground hover:bg-secondary/50'
-                }`}
+                  }`}
               >
                 {link.label}
               </a>

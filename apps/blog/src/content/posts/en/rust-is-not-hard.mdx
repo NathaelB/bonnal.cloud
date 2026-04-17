@@ -1,0 +1,103 @@
+---
+title: "Rust is not hard, we've just been spoiled by unsafe languages"
+description: "Rust has a reputation for being difficult. That reputation is wrong. What Rust forces you to learn is not arbitrary complexity, it's what other languages let you ignore."
+short_description: "Rust's reputation for difficulty confuses honesty with complexity."
+date: 2026-03-12
+tags:
+  - rust
+  - architecture
+  - engineering
+  - open-source
+  - dx
+status: published
+author: nathael
+---
+
+Every few months, the same conversation resurfaces on the internet. Someone tries Rust, hits the borrow checker, and concludes that the language is unnecessarily complex. The post gets upvoted, people commiserate, and Rust gets its reputation reinforced as the difficult language, the one you only use if you have something to prove.
+
+I'd like to offer a different reading.
+
+Rust is not hard. It is honetes. And there's a meaningful difference between the two.
+
+
+## What `difficult` actually means
+
+I came to Rust from C, OCaml, and TypeScript. That backgrounds matters, because it shaped the way I experienced the language. The borrow checker wasn't alien to me, I had already managed memory by hand in C and felt the consequences of getting it wrong. The type system didn't intimidate me, OCaml had already taught me to think in terms of algebraic types and exhaustive pattern matching. TypeScript had given me a taste of what it feels like when a compiler catches your mistakes before your users do.
+
+What struck me about Rust, then wasn't the difficulty. It was the consistency. Every constraint the language imposes traces back to a real problem. Nothing is arbitrary. And once you start to see that, the frustration of fighting the compiler gives way to something more interesting: the realization that other languages had been quietly hiding these problems from you all along.
+
+A language that let you write incorrect code without complaint is not simpler. It is more forgiving. THose are not the same thing.
+
+## The borrow checker, a strict teacher, not an obstacle
+
+The borrow checker is where most Rust journeys stall. You write something that feels reasonable, the compiler refuses it, and the error message, however detailed, doestn't immediately illuminate why your mental model was wrong.
+
+But here's what the borrow checker is actually doing: it is rejecting programs that would have compiled in any other language and crashed in production. Use-after-free. Data races. Dangling references. These are not theoritical concerns, they are the source fo a substantial portion of CVEs in systems software, including some of the most severe vulnerabilities in the history of production infrastructure.
+
+Coming from C, I had lived those consequences. I had chased segfaults through codebases where the allocation and the bug were separated by dozens of call frames. The borrow checker would have caught every one of them at compile time.
+
+What the borrow checker teaches you is not Rust syntax. It teaches you to reason about the lifetime of data, when it is created, who owns it, when it is safe to release it. This is knowledge that every systems programmer should have. Rust simply makes it non-negotiable.
+
+
+## Explicit errors, honesty as a deign principle
+
+Exceptions are a comfortable lie. They let you write the happy path as if it were the only path, and defer the question of what happens when things go wrong until it's too late to answer it well.
+
+Rust's `Result<T, E>` type takes the opposite stance. Every operation that can fail returns a value that forces you to decide what to do with that failure. You cannot ignore it. You cannot accidentally let it propagate silently through layers of abstraction. The error is a first-class citizen of your program, and the language ensures you treat it that way.
+
+For anyone coming from OCaml, this pattern is familiar, it's essentially the same discipline that pattern matching on option and result types imposes in functional languages. What Rust adds is that this discipline is universal and enforced by the compiler, not left to the programmer's judgment. The result, in practice, is codebases where error handling is genuinely thoughtful rather than an afterthought. Not because Rust developers are more careful, but because the language leaves no other option.
+
+
+## The type system, rigour as freedom
+
+There's a widespread intuition that a strong type system slows you down. In my experience, the opposite is true, but only once you strop fighting it and start working with it.
+
+When the compiler knows precisely what every value can be, it can tell you what is impossible. It can tell you when you've missed a case. It can guide a refactor across an entire codebase, pointing to every location that needs to change when you add a new variant to an enum. This is not constriant, it is leverage.
+
+TypeScript gave me a version of this, but with escape hatches, `any` exists.
+Type assertions exist. The doors are there, and they're tempting when the type system pushes back. Rust closes the doors. The compiler's understanding of your program is total, and because of that, it's guarantees are total too.
+
+The experience of adding a new variant to a Rust enum and watching the compiler enumerate every match expression that needs updating is genuinely one of the most pleasant things in software development. It turns what would be a fragile, grep-based refactor into something the languages handles for you.
+
+This precision extends beyond your domain model. It reaches into one of the most treacherous corners of systems programming: concurrency. In most languages, sharing state across threads is a matter of discipline, you know you should protect that value, you add a lock, and you hope you didn't miss anything. Rust makes that discipline structural. The type system encodes the question directly: is this value shared across threads? Can it be mutated? By how many parties simultaneously? Depending on your answers, the language steers you toward Arc, Mutex, RwLock, or Atomic each a precise fit for a specific concurrency context, each with guarantees the compiler enforces rather than the programmer promises.
+
+THe decision tree below captures this beautifully. What looks at first like a zoo of unfamiliar types is actually a vocabulary, a set of tools, each designed for a precise situation. Learning to read it is learning to thing about concurrency the way Rust does: not as a problem to manage at runtime, but as a set of constraints to express at compile time.
+
+![Rust memory container](/rust_memory_container.png)
+
+
+## No garbage collector, not a regression, a clarity
+
+The absence of a garbage collector is often framed as a sacrifice, something you give up in exchange for performance. I think that framing is wrong.
+
+A garbage collector doesn't eliminate the complexity of memory management. It defers it. You stop thinking about it until you're debugging a latency spike caused by a GC pause under load, or trying to understand why your service's memory footprint grows in ways you can't predict. The complexity was always there. The GC just made it invisible, and invisible complexity is the hardest kind to reason about.
+
+Rust's ownership model makes memory deterministic. You know exactly when a value is allocated and when it is freed, because the compiler enforces it. For systems software, an IAM, a network proxy, a database engine this predictability is not a nice-to-have. It is a design property that affects every performance and reliability guarantee you can make.
+
+## The unexpected advantage, Rust and AI agents
+
+There's a dimension tu Rust's rigour that I didn't anticipate when I started using it for FerrisKey, but that has become increasingly clear: a well-typed, well-structured Rust codebase is one of the best environments you can give an AI agent to work in.
+
+When you ask an agent to extend a codebase, the quality of what it produces depends heavily on how much structure that codebase provides. In a permissive language, an agent can generate code that compiles, runs, and does the wrong thing, and nothing in the environment will tell it so. In Rust, the compiler acts as an immediate reviewer. If the agent produces something semantically incorrect, the build fails. The feedback loop is tight, the errors are precise, and the agent can course-correct.
+
+Beyond that, the Rust ecosystem is coherent. Conventions are strong patterns are well-established, and the documentation culture is serious. Agents working in this environment have more signal and less ambiguity to navigate. The result is fewer hallucinations, less friction, and a collaboration between human and agent that feels genuinely productive rather than constantly supervised.
+
+This is the convention I didn't expect: the rigour that made Rust feel show to adopt turns out to accelerate AI-assisted iteration. A codebase that the compiler understands completely is also a codebase that an agent can extend with confidence.
+
+## So why does Rust feel hard ?
+
+Because it doesn't let you defer the difficult decisions.
+
+In most languages, you can write code that works without fully understanding what's happening beneath it. The runtime absorbs your mistakes. The garbage collector cleans up after you. The type system looks the other way. This is genuinely comfortable, especially in the early stages of a project when speed matters and correctness feels like something you'll get to later.
+
+Rust refuses that bargain. Every decision you would normally defer about ownership, about error handling, about the shape of your data has to be made explicitly and upfront. That friction is real. But it is not complexity introduced by Rust. It is complexity that was always present in your program, finally made visible.
+
+The question worth sitting with is this: the next time the Rust compiler rejects your code, what would have happened if another compiler had accepted it?
+
+## A different way to read the difficulty
+
+Rust is not for every context, and that's a reasonable position. But the narrative that Rust is simply too hard deserves to be challenged, because it mistakes the messenger for the message.
+
+The things Rust makes you learn, how memory works, how errors progagate, how to model your domain precisely with types are things worth knowing regardless of what language you write. Rust just makes them prerequisites rather than optional enrichment.
+
+And in a world where AI agents are becoming genuine collaborators in software engineering, a language that constrains, encodes intent, and surfaces mistakes immediately is not a liability. It's exactly the kind of environment where good software get built by humans agents alike.

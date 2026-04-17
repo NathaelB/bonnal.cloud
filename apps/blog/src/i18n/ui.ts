@@ -10,8 +10,8 @@ export const ui = {
     'index.noResults': 'No articles match your search.',
 
     // RSS
-    'rss.title': 'Explainer Blog',
-    'rss.description': 'Latest articles from the Explainer blog',
+    'rss.title': 'Nathael Blog',
+    'rss.description': 'Latest articles from the Nathael blog',
 
     // Footer
     'footer.text': 'Built with Explainer v2',
@@ -55,8 +55,8 @@ export const ui = {
     'index.noResults': 'Aucun article ne correspond à votre recherche.',
 
     // RSS
-    'rss.title': 'Blog Explainer',
-    'rss.description': 'Les derniers articles du blog Explainer',
+    'rss.title': 'Blog Nathael',
+    'rss.description': 'Les derniers articles du blog Nathael',
 
     // Footer
     'footer.text': 'Construit avec Explainer v2',
