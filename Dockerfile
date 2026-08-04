@@ -29,7 +29,7 @@ COPY . .
 ENV PUBLIC_WEBSITE_URL=https://bonnal.cloud
 ENV PUBLIC_BLOG_URL=https://blog.bonnal.cloud
 
-RUN pnpm build
+RUN pnpm turbo build --filter=@explainer/blog --filter=@explainer/website
 
 FROM nginx:1.28.0-alpine3.21-slim AS blog
 COPY ./nginx.conf /etc/nginx/nginx.conf
