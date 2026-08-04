@@ -1,0 +1,79 @@
+---
+import '../styles/globals.css'
+import { ClientRouter } from 'astro:transitions'
+import { formatTitle } from '@explainer/config'
+import { siteConfig } from '../config'
+
+interface Props {
+  title: string
+  description?: string
+  thumbnail?: string
+}
+
+const { title, description, thumbnail } = Astro.props
+const thumbnailUrl = new URL(thumbnail ?? siteConfig.thumbnail, Astro.site)
+const canonicalUrl = new URL(Astro.url.pathname, Astro.site)
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/svg+xml" href={siteConfig.favicon} />
+    <link rel="canonical" href={canonicalUrl} />
+    <meta name="description" content={description ?? siteConfig.description} />
+    <meta property="og:site_name" content={siteConfig.name} />
+    <meta property="og:url" content={canonicalUrl} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description ?? siteConfig.description} />
+    <meta property="og:image" content={thumbnailUrl} />
+    <meta property="og:type" content={siteConfig.ogType} />
+    <meta name="twitter:card" content={siteConfig.twitterCard} />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description ?? siteConfig.description} />
+    <meta name="twitter:image" content={thumbnailUrl} />
+    <title>{formatTitle(siteConfig, title)}</title>
+    <ClientRouter />
+    <script is:inline>
+      (function () {
+        var match = document.cookie.match(/(?:^|; )theme=([^;]*)/)
+        var theme = match ? match[1] : 'system'
+        var isDark = theme === 'dark' || (theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches)
+        document.documentElement.classList.toggle('dark', isDark)
+      })()
+    </script>
+    <script is:inline>
+      document.addEventListener('astro:after-swap', function () {
+        var match = document.cookie.match(/(?:^|; )theme=([^;]*)/)
+        var theme = match ? match[1] : 'system'
+        var isDark = theme === 'dark' || (theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches)
+        document.documentElement.classList.toggle('dark', isDark)
+      })
+    </script>
+  </head>
+  <body class="min-h-screen antialiased">
+    <slot />
+    <script is:inline>
+      function initRevealObserver() {
+        var els = document.querySelectorAll('[data-reveal]:not(.revealed)')
+        if (!els.length) return
+        var observer = new IntersectionObserver(function (entries) {
+          entries.forEach(function (entry) {
+            if (entry.isIntersecting) {
+              var delay = entry.target.getAttribute('data-reveal-delay')
+              if (delay) {
+                entry.target.style.transitionDelay = delay + 'ms'
+              }
+              entry.target.classList.add('revealed')
+              observer.unobserve(entry.target)
+            }
+          })
+        }, { threshold: 0.12 })
+        els.forEach(function (el) { observer.observe(el) })
+      }
+      initRevealObserver()
+      document.addEventListener('astro:after-swap', initRevealObserver)
+    </script>
+  </body>
+</html>

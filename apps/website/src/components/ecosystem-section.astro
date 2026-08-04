@@ -1,0 +1,99 @@
+---
+import { Icon } from "@iconify/react";
+import { PlatformGraph } from "./platform-graph";
+---
+
+<section class="relative py-24 sm:py-32">
+  <div class="max-w-6xl mx-auto px-6">
+
+    <!-- Header -->
+    <div class="mb-12" data-reveal="fade-up">
+      <p class="text-sm font-semibold text-primary uppercase tracking-widest mb-3">Platform</p>
+      <h2 class="text-3xl font-bold text-foreground sm:text-4xl">
+        Not isolated projects.<br class="hidden sm:block" /> A coherent platform.
+      </h2>
+      <p class="mt-4 text-lg text-muted-foreground max-w-2xl">
+        Each product has a defined role, clear service boundaries, and a shared identity foundation.
+      </p>
+    </div>
+
+    <!-- Desktop: React Flow graph -->
+    <div class="hidden md:block" data-reveal="fade-up" data-reveal-delay="100">
+      <PlatformGraph client:only="react" />
+    </div>
+
+    <!-- Mobile: card fallback -->
+    <div class="md:hidden flex flex-col gap-3" data-reveal="fade-up" data-reveal-delay="100">
+
+      <!-- FerrisKey -->
+      <a
+        href="https://ferriskey.rs"
+        target="_blank"
+        rel="noopener noreferrer"
+        class="group rounded-xl border border-border bg-card p-5 flex items-start gap-4 transition-all duration-200 hover:shadow-md"
+      >
+        <div class="flex items-center justify-center size-11 rounded-xl border border-border bg-orange-500/10 shrink-0">
+          <Icon icon="mdi:shield-key-outline" className="size-6 text-orange-400" client:load />
+        </div>
+        <div class="flex-1 min-w-0">
+          <div class="flex items-center gap-2 mb-1">
+            <p class="text-sm font-bold text-foreground">FerrisKey</p>
+            <span class="text-[10px] font-semibold text-orange-400">Identity Foundation</span>
+          </div>
+          <p class="text-xs text-muted-foreground leading-relaxed">The IAM layer of the platform. Authentication, authorization, OIDC, and multi-tenant policy.</p>
+        </div>
+      </a>
+
+      <div class="grid grid-cols-2 gap-3">
+        <!-- Ferriscord -->
+        <a
+          href="https://github.com/ferrislabs/ferriscord"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="group rounded-xl border border-border bg-card p-4 flex flex-col gap-3 transition-all duration-200 hover:shadow-md"
+        >
+          <div class="flex items-center justify-center size-10 rounded-xl border border-border bg-violet-500/10">
+            <Icon icon="mdi:forum-outline" className="size-5 text-violet-400" client:load />
+          </div>
+          <div>
+            <p class="text-sm font-bold text-foreground">Ferriscord</p>
+            <p class="text-[10px] font-semibold text-violet-400">Realtime</p>
+          </div>
+        </a>
+
+        <!-- Mestier -->
+        <a
+          href="https://github.com/ferrislabs/mestier"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="group rounded-xl border border-border bg-card p-4 flex flex-col gap-3 transition-all duration-200 hover:shadow-md"
+        >
+          <div class="flex items-center justify-center size-10 rounded-xl border border-border bg-blue-500/10">
+            <Icon icon="mdi:office-building-outline" className="size-5 text-blue-400" client:load />
+          </div>
+          <div>
+            <p class="text-sm font-bold text-foreground">Mestier</p>
+            <p class="text-[10px] font-semibold text-blue-400">SaaS · CRM/ERP</p>
+          </div>
+        </a>
+      </div>
+
+      <!-- FerrisKV -->
+      <a
+        href="https://github.com/ferrislabs/ferriskv"
+        target="_blank"
+        rel="noopener noreferrer"
+        class="group rounded-xl border border-border bg-card p-4 flex items-center gap-4 transition-all duration-200 hover:shadow-md"
+      >
+        <div class="flex items-center justify-center size-10 rounded-xl border border-border bg-teal-500/10 shrink-0">
+          <Icon icon="mdi:database-sync-outline" className="size-5 text-teal-400" client:load />
+        </div>
+        <div>
+          <p class="text-sm font-bold text-foreground">FerrisKV</p>
+          <p class="text-[10px] font-semibold text-teal-400">Distributed KV</p>
+        </div>
+      </a>
+    </div>
+
+  </div>
+</section>

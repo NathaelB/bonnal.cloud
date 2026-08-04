@@ -1,0 +1,200 @@
+---
+import { BackgroundAnimation } from './background-animation'
+import { Icon } from '@iconify/react'
+import { buttonVariants } from '@explainer/ui'
+---
+
+<style>
+  .h-in {
+    opacity: 0;
+    transform: translateY(14px);
+    animation: h-reveal 0.55s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  }
+  @keyframes h-reveal {
+    to { opacity: 1; transform: none; }
+  }
+</style>
+
+<div class="relative flex flex-col pt-10 sm:pt-32 lg:pt-36 overflow-hidden">
+  <div class="absolute inset-0 -z-20 w-full">
+    <BackgroundAnimation client:only="react" />
+  </div>
+
+  <!-- Decorative grid -->
+  <div
+    class="absolute inset-0 -z-5 pointer-events-none"
+    style="clip-path: inset(0 -100vw 0 -100vw);"
+    aria-hidden="true"
+  >
+    <div
+      class="absolute inset-0 opacity-[0.07]"
+      style="background-image: linear-gradient(to right, var(--color-primary) 1px, transparent 1px), linear-gradient(to bottom, var(--color-primary) 1px, transparent 1px); background-size: 75px 75px; mask-image: radial-gradient(ellipse 75% 65% at 50% 25%, black 0%, transparent 75%); -webkit-mask-image: radial-gradient(ellipse 75% 65% at 50% 25%, black 0%, transparent 75%);"
+    >
+    </div>
+
+    <!-- Corner accents -->
+    <div class="absolute top-12 left-8 size-3 border border-primary/25 sm:top-16 sm:left-16"></div>
+    <div class="hidden sm:block absolute top-20 right-16 size-4 border border-primary/20"></div>
+    <div class="hidden sm:block absolute top-1/2 -left-2 size-2.5 border border-primary/20 -translate-y-1/2"></div>
+    <div class="hidden sm:block absolute bottom-24 right-1/4 size-3 bg-primary/10"></div>
+    <div class="hidden sm:block absolute bottom-16 left-1/3 size-2 bg-primary/10"></div>
+  </div>
+
+  <!-- Bottom separator -->
+  <div class="absolute bottom-0 inset-x-0 h-px bg-linear-to-r from-transparent via-border to-transparent"></div>
+
+  <div class="w-full max-w-6xl mx-auto px-6 pb-16 lg:pb-20">
+    <div class="grid gap-10 lg:gap-14 lg:grid-cols-[1.05fr_0.95fr] lg:items-center">
+      <!-- Left: datasheet -->
+      <div>
+        <div
+          class="h-in flex items-center gap-3 font-mono text-[11px] uppercase tracking-[0.18em] text-muted-foreground"
+          style="animation-delay: 0ms;"
+        >
+          <span class="text-primary">01</span>
+          <span data-t="hero.index">Profile</span>
+          <span class="h-px flex-1 bg-border"></span>
+        </div>
+
+        <div class="h-in" style="animation-delay: 80ms;">
+          <h1 class="mt-5 text-4xl text-pretty tracking-tight text-foreground font-semibold sm:text-6xl">
+            <span data-t="hero.title">Nathaël Bonnal,</span><br>
+            <span class="text-muted-foreground" data-t="hero.headline">architect for robust and scalable systems</span>
+          </h1>
+        </div>
+
+        <p
+          class="h-in text-lg sm:text-xl/8 text-muted-foreground text-pretty mt-6 max-w-2xl"
+          style="animation-delay: 160ms;"
+          data-t="hero.description"
+        >
+          I build IAM primitives, distributed architectures and production systems. From the first API contract to the last alert resolved.
+        </p>
+
+        <!-- Spec table (datasheet) -->
+        <dl class="h-in mt-8 max-w-md overflow-hidden rounded-[3px] border border-border bg-background font-mono text-sm" style="animation-delay: 240ms;">
+          <div class="grid grid-cols-[92px_1fr] border-b border-border">
+            <dt class="flex items-center border-r border-border px-3 py-2.5 text-[11px] uppercase tracking-wider text-muted-foreground" data-t="hero.spec.k1">Stack</dt>
+            <dd class="flex items-center px-3.5 py-2.5 text-foreground" data-t="hero.spec.v1">Rust · IAM · Kubernetes · OIDC</dd>
+          </div>
+          <div class="grid grid-cols-[92px_1fr] border-b border-border">
+            <dt class="flex items-center border-r border-border px-3 py-2.5 text-[11px] uppercase tracking-wider text-muted-foreground" data-t="hero.spec.k2">Scope</dt>
+            <dd class="flex items-center px-3.5 py-2.5 text-foreground" data-t="hero.spec.v2">Distributed systems &amp; security</dd>
+          </div>
+          <div class="grid grid-cols-[92px_1fr] border-b border-border">
+            <dt class="flex items-center border-r border-border px-3 py-2.5 text-[11px] uppercase tracking-wider text-muted-foreground" data-t="hero.spec.k3">Ref</dt>
+            <dd class="flex items-center gap-2 px-3.5 py-2.5 text-foreground">
+              <span class="size-1.5 bg-primary" aria-hidden="true"></span>
+              <span data-t="hero.spec.v3">FerrisKey · lead-maintainer</span>
+            </dd>
+          </div>
+          <div class="grid grid-cols-[92px_1fr]">
+            <dt class="flex items-center border-r border-border px-3 py-2.5 text-[11px] uppercase tracking-wider text-muted-foreground" data-t="hero.currentlyAt">Currently at</dt>
+            <dd class="flex items-center px-3.5 py-2.5 text-foreground" data-t="hero.employer">Cloud IAM</dd>
+          </div>
+        </dl>
+
+        <div class="h-in pt-8 flex flex-wrap gap-x-4 gap-y-3" style="animation-delay: 320ms;">
+          <a href="#projects" class={buttonVariants({ size: 'lg', className: 'cursor-pointer rounded-[3px]' })}>
+            <span data-t="hero.primaryAction">View my projects</span>
+            <Icon icon="mdi:arrow-right" aria-hidden="true" className="size-5" client:load />
+          </a>
+          <a
+            href="https://github.com/nathaelb"
+            target="_blank"
+            rel="noopener noreferrer"
+            class={buttonVariants({ variant: 'outline', size: 'lg', className: 'cursor-pointer rounded-[3px]' })}
+          >
+            <Icon icon="mdi:github" aria-hidden="true" className="size-5" client:load />
+            <span data-t="hero.secondaryAction">GitHub</span>
+          </a>
+        </div>
+      </div>
+
+      <!-- Right: schematic figure, image 2x2 (0) + 5 capability cards (1), shape 100/100/111 -->
+      <div class="h-in" style="animation-delay: 200ms;">
+        <div class="mx-auto w-full max-w-md">
+          <div class="mb-2 flex items-center justify-between font-mono text-[10px] uppercase tracking-[0.18em] text-muted-foreground">
+            <span data-t="hero.index">Profile</span>
+            <span>Fig.01 · 1:1</span>
+          </div>
+
+          <div class="relative">
+            <div class="grid grid-cols-3 gap-px overflow-hidden rounded-[3px] border border-border bg-border">
+              <!-- F1 -->
+              <div class="col-start-1 row-start-1 aspect-square bg-background p-3 flex flex-col justify-between transition-colors hover:bg-primary/[0.03]">
+                <span class="inline-flex size-9 items-center justify-center rounded-[2px] bg-primary/10 text-primary">
+                  <Icon icon="mdi:language-rust" className="size-5" client:load />
+                </span>
+                <div>
+                  <p class="font-mono text-sm font-semibold text-foreground leading-none">Rust</p>
+                  <p class="mt-1 text-[11px] text-muted-foreground">services · CLI</p>
+                </div>
+              </div>
+
+              <!-- Profile image (2x2) -->
+              <div class="col-start-2 row-start-1 col-span-2 row-span-2 overflow-hidden bg-background">
+                <img
+                  src="/me.png"
+                  alt="Nathaël Bonnal"
+                  class="h-full w-full object-cover object-top"
+                  loading="eager"
+                />
+              </div>
+
+              <!-- F2 -->
+              <div class="col-start-1 row-start-2 aspect-square bg-background p-3 flex flex-col justify-between transition-colors hover:bg-primary/[0.03]">
+                <span class="inline-flex size-9 items-center justify-center rounded-[2px] bg-primary/10 text-primary">
+                  <Icon icon="mdi:shield-key-outline" className="size-5" client:load />
+                </span>
+                <div>
+                  <p class="font-mono text-sm font-semibold text-foreground leading-none">IAM</p>
+                  <p class="mt-1 text-[11px] text-muted-foreground">OIDC · tokens</p>
+                </div>
+              </div>
+
+              <!-- F3 -->
+              <div class="col-start-1 row-start-3 aspect-square bg-background p-3 flex flex-col justify-between transition-colors hover:bg-primary/[0.03]">
+                <span class="inline-flex size-9 items-center justify-center rounded-[2px] bg-primary/10 text-primary">
+                  <Icon icon="mdi:kubernetes" className="size-5" client:load />
+                </span>
+                <div>
+                  <p class="font-mono text-sm font-semibold text-foreground leading-none">K8s</p>
+                  <p class="mt-1 text-[11px] text-muted-foreground">operators</p>
+                </div>
+              </div>
+
+              <!-- F4 -->
+              <div class="col-start-2 row-start-3 aspect-square bg-background p-3 flex flex-col justify-between transition-colors hover:bg-primary/[0.03]">
+                <span class="inline-flex size-9 items-center justify-center rounded-[2px] bg-primary/10 text-primary">
+                  <Icon icon="mdi:file-lock-outline" className="size-5" client:load />
+                </span>
+                <div>
+                  <p class="font-mono text-sm font-semibold text-foreground leading-none">RBAC</p>
+                  <p class="mt-1 text-[11px] text-muted-foreground">OPA · policy</p>
+                </div>
+              </div>
+
+              <!-- F5 -->
+              <div class="col-start-3 row-start-3 aspect-square bg-background p-3 flex flex-col justify-between transition-colors hover:bg-primary/[0.03]">
+                <span class="inline-flex size-9 items-center justify-center rounded-[2px] bg-primary/10 text-primary">
+                  <Icon icon="mdi:chart-timeline-variant" className="size-5" client:load />
+                </span>
+                <div>
+                  <p class="font-mono text-sm font-semibold text-foreground leading-none">Obs</p>
+                  <p class="mt-1 text-[11px] text-muted-foreground">traces · SLO</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Blueprint corner ticks -->
+            <span class="absolute -top-1 -left-1 size-2 border border-primary/40" aria-hidden="true"></span>
+            <span class="absolute -top-1 -right-1 size-2 border border-primary/40" aria-hidden="true"></span>
+            <span class="absolute -bottom-1 -left-1 size-2 border border-primary/40" aria-hidden="true"></span>
+            <span class="absolute -bottom-1 -right-1 size-2 border border-primary/40" aria-hidden="true"></span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

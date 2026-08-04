@@ -1,0 +1,21 @@
+---
+import { getCollection } from 'astro:content'
+import { buildHref } from '../lib/docs'
+
+const allDocs = await getCollection('docs')
+const first = allDocs.sort((a, b) => (a.data.order ?? Infinity) - (b.data.order ?? Infinity))[0]
+const defaultRedirect = first ? buildHref(first) : '/'
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Redirecting...</title>
+    <meta name="robots" content="noindex" />
+    <meta http-equiv="refresh" content={`0;url=${defaultRedirect}`} />
+  </head>
+  <body>
+    <p>Redirecting to <a href={defaultRedirect}>documentation</a>...</p>
+  </body>
+</html>

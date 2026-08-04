@@ -1,0 +1,82 @@
+image:
+  pullPolicy: IfNotPresent
+  # Shared by website and blog images.
+  tag: "28f8ebf"
+
+imagePullSecrets: []
+
+nameOverride: ""
+fullnameOverride: "bonnal-cloud"
+
+apps:
+  website:
+    enabled: true
+    replicaCount: 1
+    image:
+      repository: ghcr.io/nathaelb/bonnal-cloud-website
+    host: bonnal.cloud
+  blog:
+    enabled: true
+    replicaCount: 1
+    image:
+      repository: ghcr.io/nathaelb/bonnal-cloud-blog
+    host: blog.bonnal.cloud
+
+serviceAccount:
+  create: false
+
+podAnnotations: {}
+podLabels: {}
+
+podSecurityContext: {}
+
+securityContext:
+  runAsNonRoot: true
+  runAsUser: 1000
+  allowPrivilegeEscalation: false
+  readOnlyRootFilesystem: true
+
+service:
+  type: ClusterIP
+  port: 80
+  targetPort: 8080
+
+ingress:
+  enabled: true
+  className: traefik
+  clusterIssuer: letsencrypt-prod
+  path: /
+  pathType: Prefix
+  annotations: {}
+
+# Gateway API (HTTPRoute) exposure, as an alternative or addition to ingress above.
+# Enable independently of `ingress` — both can run side by side during a migration.
+gatewayApi:
+  enabled: false
+  # GatewayClass used when this chart creates its own Gateway (below).
+  gatewayClassName: traefik
+  # cert-manager cluster issuer, annotated on the Gateway (gateway-shim).
+  clusterIssuer: letsencrypt-prod
+  # Prefix for the per-app listener/sectionName this chart creates on its own Gateway.
+  listenerNamePrefix: https
+  annotations: {}
+  # Point HTTPRoutes at a Gateway managed outside this chart instead of creating one.
+  # Leave name empty to have the chart create and manage its own Gateway.
+  existingGateway:
+    name: ""
+    namespace: ""
+
+resources:
+  requests:
+    cpu: 50m
+    memory: 64Mi
+  limits:
+    cpu: 200m
+    memory: 128Mi
+
+autoscaling:
+  enabled: false
+
+nodeSelector: {}
+tolerations: []
+affinity: {}

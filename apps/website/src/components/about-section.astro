@@ -1,0 +1,73 @@
+---
+import { Icon } from "@iconify/react";
+
+const stats = [
+  { icon: "mdi:briefcase-outline", valueKey: "about.stat1.value", labelKey: "about.stat1.label", value: "10+", label: "Years of experience" },
+  { icon: "mdi:sitemap-outline", valueKey: "about.stat2.value", labelKey: "about.stat2.label", value: "15+", label: "Architectures designed" },
+  { icon: "mdi:source-branch", valueKey: "about.stat3.value", labelKey: "about.stat3.label", value: "30+", label: "Open-source repos" },
+  { icon: "mdi:account-group-outline", valueKey: "about.stat4.value", labelKey: "about.stat4.label", value: "5+", label: "Teams mentored" },
+];
+---
+
+<section id="about" class="relative py-24 sm:py-32">
+  <div class="max-w-6xl mx-auto px-6">
+    <!-- Section header -->
+    <div class="text-center mb-16" data-reveal="fade-up">
+      <p
+        class="text-sm font-semibold text-primary uppercase tracking-widest mb-3"
+        data-t="about.label"
+      >
+        About
+      </p>
+      <h2 class="text-3xl font-bold text-foreground sm:text-4xl" data-t="about.title">
+        Who I am
+      </h2>
+      <p
+        class="mt-4 text-lg text-muted-foreground max-w-2xl mx-auto text-balance"
+        data-t="about.description"
+      >
+        Designing systems that scale, one architecture decision at a time.
+      </p>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-start">
+      <!-- Left: Bio -->
+      <div data-reveal="fade-up" data-reveal-delay="100">
+        <div class="space-y-4">
+          <p class="text-muted-foreground leading-relaxed" data-t="about.bio1">
+            I'm a software engineer with over 10 years of experience designing systems that balance performance, maintainability, and developer experience. I care about making the right trade-offs, not just shipping features.
+          </p>
+          <p class="text-muted-foreground leading-relaxed" data-t="about.bio2">
+            I work across the full stack, but my focus is at the architecture level: defining service boundaries, choosing the right patterns for the problem, and designing APIs that teams can build on. From event-driven backends in Rust to modular frontend architectures, I design for the long term.
+          </p>
+          <p class="text-muted-foreground leading-relaxed" data-t="about.bio3">
+            I build open-source tools that reflect these principles and write about software architecture to help other engineers think beyond the code.
+          </p>
+        </div>
+      </div>
+
+      <!-- Right: Stats grid -->
+      <div class="grid grid-cols-2 gap-4" data-reveal="fade-up" data-reveal-delay="250">
+        {
+          stats.map((stat, i) => (
+            <div class="group bg-card/50 backdrop-blur-sm border border-border/50 rounded-2xl p-6 hover:-translate-y-1 hover:shadow-lg hover:shadow-primary/5 transition-all duration-300">
+              <div class="flex items-center justify-center size-11 rounded-xl bg-primary/10 mb-4 group-hover:bg-primary/15 transition-colors">
+                <Icon
+                  icon={stat.icon}
+                  className="size-5 text-primary"
+                  client:load
+                />
+              </div>
+              <p class="text-3xl font-bold text-foreground" data-t={stat.valueKey}>
+                {stat.value}
+              </p>
+              <p class="text-sm text-muted-foreground mt-1" data-t={stat.labelKey}>
+                {stat.label}
+              </p>
+            </div>
+          ))
+        }
+      </div>
+    </div>
+  </div>
+</section>

@@ -1,0 +1,56 @@
+---
+import Base from '../layouts/base.astro'
+import { WebsiteNavbar } from '../components/website-navbar'
+import HeroSection from '../components/hero-section.astro'
+import FerrisKeySpotlightSection from '../components/ferriskey-spotlight-section.astro'
+import PrinciplesSection from '../components/principles-section.astro'
+import IamSection from '../components/iam-section.astro'
+import ProjectsSection from '../components/projects-section.astro'
+import LatestArticlesSection from '../components/latest-articles-section.astro'
+import ContactSection from '../components/contact-section.astro'
+import { Footer } from '@explainer/ui'
+import { siteConfig } from '../config'
+
+const appUrlOverrides = {
+  website: import.meta.env.PUBLIC_WEBSITE_URL,
+  docs: import.meta.env.PUBLIC_DOCS_URL,
+  blog: import.meta.env.PUBLIC_BLOG_URL,
+}
+
+const siteUrl = Astro.site ? Astro.site.href.replace(/\/$/, '') : ''
+const structuredData = {
+  '@context': 'https://schema.org',
+  '@graph': [
+    {
+      '@type': 'Person',
+      name: 'Nathaël Bonnal',
+      url: siteUrl,
+      jobTitle: 'Software Engineer',
+      worksFor: { '@type': 'Organization', name: 'Cloud IAM' },
+      sameAs: ['https://github.com/nathaelb', 'https://www.linkedin.com/in/nathael-bonnal'],
+    },
+    {
+      '@type': 'WebSite',
+      name: 'Nathaël Bonnal',
+      url: siteUrl,
+    },
+  ],
+}
+---
+
+<Base title="Nathaël Bonnal" description="Software Engineer specialized in designing robust, scalable products through thoughtful software architecture tailored to your product." thumbnail="/thumbnail.png">
+  <script type="application/ld+json" set:html={JSON.stringify(structuredData)} />
+  <WebsiteNavbar appUrlOverrides={appUrlOverrides} client:load transition:persist />
+
+  <HeroSection />
+  <PrinciplesSection />
+  <IamSection />
+  <FerrisKeySpotlightSection />
+  <ProjectsSection />
+  <LatestArticlesSection />
+  <ContactSection />
+
+  <div class="mx-auto max-w-6xl px-6">
+    <Footer config={siteConfig} appUrlOverrides={appUrlOverrides} client:load />
+  </div>
+</Base>

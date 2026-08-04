@@ -1,0 +1,34 @@
+{{- if and .Values.gatewayApi.enabled (not .Values.gatewayApi.existingGateway.name) }}
+apiVersion: gateway.networking.k8s.io/v1
+kind: Gateway
+metadata:
+  name: {{ include "bonnal-cloud.fullname" . }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "bonnal-cloud.labels" . | nindent 4 }}
+  annotations:
+    {{- if .Values.gatewayApi.clusterIssuer }}
+    cert-manager.io/cluster-issuer: {{ .Values.gatewayApi.clusterIssuer }}
+    {{- end }}
+    {{- with .Values.gatewayApi.annotations }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+spec:
+  gatewayClassName: {{ .Values.gatewayApi.gatewayClassName }}
+  listeners:
+    {{- range $name, $app := .Values.apps }}
+    {{- if ($app.enabled | default true) }}
+    - name: {{ printf "%s-%s" $.Values.gatewayApi.listenerNamePrefix $name }}
+      protocol: HTTPS
+      port: 443
+      hostname: {{ $app.host }}
+      tls:
+        mode: Terminate
+        certificateRefs:
+          - name: {{ include "bonnal-cloud.appFullname" (dict "root" $ "name" $name "app" $app) }}-tls
+      allowedRoutes:
+        namespaces:
+          from: Same
+    {{- end }}
+    {{- end }}
+{{- end }}

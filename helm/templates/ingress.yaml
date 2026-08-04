@@ -1,0 +1,39 @@
+{{- if .Values.ingress.enabled }}
+{{- range $name, $app := .Values.apps }}
+{{- if ($app.enabled | default true) }}
+{{- $ctx := dict "root" $ "name" $name "app" $app }}
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ include "bonnal-cloud.appFullname" $ctx }}
+  namespace: {{ $.Release.Namespace }}
+  labels:
+    {{- include "bonnal-cloud.appLabels" $ctx | nindent 4 }}
+  annotations:
+    {{- if $.Values.ingress.clusterIssuer }}
+    cert-manager.io/cluster-issuer: {{ $.Values.ingress.clusterIssuer }}
+    {{- end }}
+    {{- with $.Values.ingress.annotations }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+spec:
+  ingressClassName: {{ $.Values.ingress.className }}
+  tls:
+    - hosts:
+        - {{ $app.host }}
+      secretName: {{ include "bonnal-cloud.appFullname" $ctx }}-tls
+  rules:
+    - host: {{ $app.host }}
+      http:
+        paths:
+          - path: {{ $.Values.ingress.path }}
+            pathType: {{ $.Values.ingress.pathType }}
+            backend:
+              service:
+                name: {{ include "bonnal-cloud.appFullname" $ctx }}
+                port:
+                  number: {{ $.Values.service.port }}
+{{- end }}
+{{- end }}
+{{- end }}

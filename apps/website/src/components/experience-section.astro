@@ -1,0 +1,143 @@
+---
+import { Icon } from "@iconify/react";
+
+const entries = [
+  {
+    dateKey: "experience.entry1.date",
+    roleKey: "experience.entry1.role",
+    companyKey: "experience.entry1.company",
+    descriptionKey: "experience.entry1.description",
+    date: "2025 - Present",
+    role: "Software Engineer",
+    company: "Cloud IAM",
+    description: "Design and build identity and access management infrastructure. Work spans API design, distributed systems, and production operations.",
+    tags: ["Rust", "IAM", "OIDC"],
+    icon: "lucide:shield-check",
+  },
+  {
+    dateKey: "experience.entry2.date",
+    roleKey: "experience.entry2.role",
+    companyKey: "experience.entry2.company",
+    descriptionKey: "experience.entry2.description",
+    date: "2022 - Present",
+    role: "Software Architect & Lead Maintainer",
+    company: "FerrisKey & Open Source",
+    description: "Co-founded FerrisKey, an open-source IAM platform in Rust. Designed the architecture, defined service boundaries and API contracts, and still own the full production stack, from CI/CD to observability.",
+    tags: ["Rust", "IAM", "Kubernetes", "Prometheus"],
+    icon: "lucide:boxes",
+  },
+  {
+    dateKey: "experience.entry3.date",
+    roleKey: "experience.entry3.role",
+    companyKey: "experience.entry3.company",
+    descriptionKey: "experience.entry3.description",
+    date: "2019 - 2022",
+    role: "Software Engineer & System Designer",
+    company: "Company",
+    description: "Designed and built web application architectures with Vue.js and AdonisJS. Defined CI/CD pipelines, data models, and mentored developers on clean architecture practices.",
+    tags: ["Vue.js", "AdonisJS", "PostgreSQL", "CI/CD"],
+    icon: "lucide:network",
+  },
+  {
+    dateKey: "experience.entry4.date",
+    roleKey: "experience.entry4.role",
+    companyKey: "experience.entry4.company",
+    descriptionKey: "experience.entry4.description",
+    date: "2016 - 2019",
+    role: "Software Developer",
+    company: "Company",
+    description: "Built web applications and discovered the importance of well-structured codebases and the open-source ecosystem.",
+    tags: ["JavaScript", "Node.js", "Web Fundamentals"],
+    icon: "lucide:terminal",
+  },
+];
+---
+
+<section id="experience" class="relative py-24 sm:py-32">
+  <div class="max-w-6xl mx-auto px-6">
+    <!-- Section header -->
+    <div class="text-center mb-16" data-reveal="fade-up">
+      <p
+        class="text-sm font-semibold text-primary uppercase tracking-widest mb-3"
+        data-t="experience.label"
+      >
+        Experience
+      </p>
+      <h2 class="text-3xl font-bold text-foreground sm:text-4xl" data-t="experience.title">
+        Professional Journey
+      </h2>
+      <p
+        class="mt-4 text-lg text-muted-foreground max-w-2xl mx-auto text-balance"
+        data-t="experience.description"
+      >
+        Key milestones in my career.
+      </p>
+    </div>
+
+    <!-- Timeline -->
+    <div class="relative max-w-3xl mx-auto">
+      <!-- Vertical line -->
+      <div
+        class="absolute left-4 md:left-1/2 top-0 bottom-0 w-px bg-gradient-to-b from-transparent via-primary/20 to-transparent -translate-x-1/2"
+        aria-hidden="true"
+      ></div>
+
+      <div class="space-y-12">
+        {entries.map((entry, i) => (
+          <div
+            class={`relative flex items-start gap-8 md:gap-12 ${i % 2 === 0 ? 'md:flex-row' : 'md:flex-row-reverse'}`}
+            data-reveal={i % 2 === 0 ? 'fade-right' : 'fade-left'}
+            data-reveal-delay={String(i * 150)}
+          >
+            {/* Timeline dot */}
+            <div
+              class="absolute left-4 md:left-1/2 -translate-x-1/2 z-10 flex items-center justify-center size-8 rounded-full bg-background border-2 border-primary/30"
+              aria-hidden="true"
+            >
+              <div class="size-3 rounded-full bg-primary/60"></div>
+            </div>
+
+            {/* Card */}
+            <div class={`ml-12 md:ml-0 md:w-[calc(50%-2rem)] ${i % 2 === 0 ? '' : 'md:ml-auto'} ${i % 2 !== 0 ? 'md:mr-0' : ''}`}>
+              <div class="group bg-card/50 backdrop-blur-sm border border-border/50 rounded-2xl p-6 hover:-translate-y-1 hover:shadow-lg hover:shadow-primary/5 transition-all duration-300">
+                {/* Date */}
+                <p class="text-xs font-semibold text-primary uppercase tracking-wider mb-2" data-t={entry.dateKey}>
+                  {entry.date}
+                </p>
+
+                {/* Role & company */}
+                <div class="flex items-start gap-3 mb-3">
+                  <div class="flex items-center justify-center size-9 rounded-lg bg-primary/10 shrink-0 mt-0.5">
+                    <Icon icon={entry.icon} className="size-4 text-primary" client:load />
+                  </div>
+                  <div>
+                    <h3 class="text-lg font-semibold text-foreground" data-t={entry.roleKey}>
+                      {entry.role}
+                    </h3>
+                    <p class="text-sm text-muted-foreground" data-t={entry.companyKey}>
+                      {entry.company}
+                    </p>
+                  </div>
+                </div>
+
+                {/* Description */}
+                <p class="text-sm text-muted-foreground leading-relaxed mb-4" data-t={entry.descriptionKey}>
+                  {entry.description}
+                </p>
+
+                {/* Tech tags */}
+                <div class="flex flex-wrap gap-2">
+                  {entry.tags.map((tag) => (
+                    <span class="text-xs font-medium bg-primary/10 text-primary rounded-full px-2.5 py-0.5">
+                      {tag}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  </div>
+</section>

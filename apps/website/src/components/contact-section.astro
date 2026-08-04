@@ -1,0 +1,89 @@
+---
+import { Icon } from "@iconify/react";
+import { Button } from "@explainer/ui";
+import { BackgroundAnimation } from "./background-animation";
+
+const corners = [
+  { icon: "lucide:bookmark", pos: "top-4 left-4" },
+  { icon: "lucide:file", pos: "top-4 right-4" },
+  { icon: "lucide:folder", pos: "bottom-4 left-4" },
+  { icon: "lucide:sparkle", pos: "bottom-4 right-4" },
+];
+
+const socials = [
+  { icon: "mdi:github", href: "https://github.com/nathaelb", label: "GitHub" },
+  { icon: "mdi:linkedin", href: "https://www.linkedin.com/in/nathael-bonnal", label: "LinkedIn" },
+  { icon: "mdi:email-outline", href: "mailto:nathael@ferriskey.rs", label: "Email" },
+];
+---
+
+<section id="contact" class="py-24 sm:py-32">
+  <div class="max-w-6xl mx-auto px-6">
+    <div
+      class="relative overflow-hidden rounded-[4px] border border-border bg-background px-6 py-20 text-center sm:py-24"
+      data-reveal="fade-scale"
+    >
+      <!-- Animated squares -->
+      <div class="absolute inset-0 z-0 opacity-30">
+        <BackgroundAnimation client:only="react" />
+      </div>
+      <!-- Decorative grid -->
+      <div
+        class="absolute inset-0 z-[1] pointer-events-none opacity-50"
+        style="background-image: linear-gradient(to right, var(--color-border) 1px, transparent 1px), linear-gradient(to bottom, var(--color-border) 1px, transparent 1px); background-size: 75px 75px; mask-image: radial-gradient(ellipse 80% 100% at 50% 50%, black 25%, transparent 88%); -webkit-mask-image: radial-gradient(ellipse 80% 100% at 50% 50%, black 25%, transparent 88%);"
+        aria-hidden="true"
+      ></div>
+
+      {corners.map((c) => (
+        <span class={`absolute z-[2] text-foreground/40 ${c.pos}`} aria-hidden="true">
+          <Icon icon={c.icon} className="size-4.5" client:load />
+        </span>
+      ))}
+
+      <div class="relative z-[3] mx-auto max-w-2xl">
+        <p class="font-mono text-xs font-semibold uppercase tracking-[0.2em] text-primary">// Contact</p>
+
+        <h2 class="mt-4 text-3xl font-bold text-foreground sm:text-4xl" data-t="contact.title">
+          Let's work together
+        </h2>
+        <p class="mx-auto mt-4 max-w-xl text-lg text-muted-foreground text-balance" data-t="contact.description">
+          Have a project in mind or just want to chat? Feel free to reach out.
+        </p>
+
+        <div class="mt-10 flex flex-wrap justify-center gap-4">
+          <Button size="lg" className="cursor-pointer rounded-[3px]" client:load>
+            <a href="mailto:nathael@ferriskey.rs" class="flex items-center gap-2">
+              <Icon icon="mdi:email-outline" aria-hidden="true" className="size-5" client:load />
+              <span data-t="contact.email">Send an email</span>
+            </a>
+          </Button>
+          <Button variant="outline" size="lg" className="cursor-pointer rounded-[3px]" client:load>
+            <a
+              href="https://www.linkedin.com/in/nathael-bonnal"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="flex items-center gap-2"
+            >
+              <Icon icon="mdi:linkedin" aria-hidden="true" className="size-5" client:load />
+              <span data-t="contact.linkedin">LinkedIn</span>
+            </a>
+          </Button>
+        </div>
+
+        <div class="mt-8 flex justify-center gap-2.5">
+          {socials.map((s) => (
+            <a
+              href={s.href}
+              target={s.href.startsWith("mailto:") ? undefined : "_blank"}
+              rel={s.href.startsWith("mailto:") ? undefined : "noopener noreferrer"}
+              class="flex size-10 items-center justify-center rounded-[3px] border border-border bg-background text-muted-foreground transition-all duration-300 hover:border-primary/45 hover:bg-primary/[6%] hover:text-primary"
+              aria-label={s.label}
+            >
+              <Icon icon={s.icon} className="size-5" client:load />
+            </a>
+          ))}
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

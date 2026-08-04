@@ -1,0 +1,171 @@
+---
+import { Icon } from "@iconify/react"
+import { readdirSync, readFileSync } from "node:fs"
+import { join } from "node:path"
+
+interface BlogPost {
+  title: string
+  description: string
+  date: Date
+  tags: string[]
+  slug: string
+  cover?: string
+}
+
+function parseFrontmatter(content: string): Record<string, any> {
+  const match = content.match(/^---\n([\s\S]*?)\n---/)
+  if (!match) return {}
+
+  const yaml = match[1]
+  const data: Record<string, any> = {}
+
+  for (const line of yaml.split('\n')) {
+    const kv = line.match(/^(\w[\w.]*)\s*:\s*(.+)$/)
+    if (!kv) continue
+    const [, key, rawValue] = kv
+    let value: any = rawValue.trim()
+
+    if (value.startsWith('[') && value.endsWith(']')) {
+      value = value.slice(1, -1).split(',').map((s: string) => s.trim().replace(/^['"]|['"]$/g, ''))
+    }
+    else if ((value.startsWith('"') && value.endsWith('"')) || (value.startsWith("'") && value.endsWith("'"))) {
+      value = value.slice(1, -1)
+    }
+
+    data[key] = value
+  }
+
+  return data
+}
+
+function loadBlogPosts(locale: string): BlogPost[] {
+  const postsDir = join(process.cwd(), '..', 'blog', 'src', 'content', 'posts', locale)
+  try {
+    const files = readdirSync(postsDir).filter((f) => f.endsWith('.mdx') || f.endsWith('.md'))
+    const posts: BlogPost[] = []
+
+    for (const file of files) {
+      const content = readFileSync(join(postsDir, file), 'utf-8')
+      const data = parseFrontmatter(content)
+      if (data.status !== 'published') continue
+
+      posts.push({
+        title: data.title ?? '',
+        description: data.description ?? '',
+        date: new Date(data.date),
+        tags: Array.isArray(data.tags) ? data.tags : [],
+        slug: file.replace(/\.mdx?$/, '').replace(/ /g, '-'),
+        cover: data.cover,
+      })
+    }
+
+    return posts.sort((a, b) => b.date.getTime() - a.date.getTime()).slice(0, 3)
+  } catch {
+    return []
+  }
+}
+
+const blogUrl = import.meta.env.PUBLIC_BLOG_URL || ''
+const posts = loadBlogPosts('en')
+
+function formatDate(date: Date, locale: string) {
+  return date.toLocaleDateString(locale, { year: 'numeric', month: 'short', day: 'numeric' })
+}
+---
+
+{posts.length > 0 && (
+  <section id="articles" class="py-24 sm:py-32">
+    <div class="max-w-6xl mx-auto px-6">
+      <!-- Section header -->
+      <div class="text-center mb-16" data-reveal="fade-up">
+        <p class="text-sm font-semibold text-primary uppercase tracking-widest mb-3" data-t="articles.label">
+          Blog
+        </p>
+        <h2 class="text-3xl font-bold text-foreground sm:text-4xl" data-t="articles.title">
+          Latest articles
+        </h2>
+        <p class="mt-4 text-lg text-muted-foreground max-w-2xl mx-auto text-balance" data-t="articles.description">
+          Stay up to date with the latest news and updates.
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        {posts.map((post, i) => (
+          <article data-reveal="fade-up" data-reveal-delay={String(i * 150)}>
+            <a
+              href={`${blogUrl}/${post.slug}`}
+              class="group relative flex h-full flex-col overflow-hidden rounded-[4px] border border-border bg-background transition-all duration-300 hover:-translate-y-1 hover:border-primary/40 hover:shadow-[0_18px_36px_-22px_rgba(0,0,0,0.45)]"
+            >
+              <span class="pointer-events-none absolute right-2 top-2 z-10 size-1.5 border border-primary/50" aria-hidden="true"></span>
+
+              <!-- Thumbnail (light + dark variants, swapped by theme) -->
+              <div class="aspect-16/10 shrink-0 overflow-hidden border-b border-border bg-muted">
+                {post.cover ? (
+                  <img src={post.cover} alt={post.title} class="h-full w-full object-cover" loading="lazy" />
+                ) : (
+                  <>
+                    <img
+                      src={`${blogUrl}/${post.slug}/thumbnail.png`}
+                      alt={post.title}
+                      class="thumb-light h-full w-full object-cover"
+                      loading="lazy"
+                    />
+                    <img
+                      src={`${blogUrl}/${post.slug}/thumbnail-dark.png`}
+                      alt={post.title}
+                      class="thumb-dark h-full w-full object-cover"
+                      loading="lazy"
+                    />
+                  </>
+                )}
+              </div>
+
+              <!-- Body -->
+              <div class="flex flex-1 flex-col p-4">
+                {post.tags.length > 0 && (
+                  <div class="mb-3 flex flex-wrap gap-1.5">
+                    {post.tags.slice(0, 3).map((tag) => (
+                      <span class="rounded-[2px] border border-primary/30 bg-primary/[6%] px-1.5 py-1 font-mono text-[9px] font-semibold uppercase tracking-wider text-primary">
+                        {tag}
+                      </span>
+                    ))}
+                  </div>
+                )}
+                <time class="font-mono text-[10px] font-semibold uppercase tracking-[0.1em] text-muted-foreground">
+                  {formatDate(post.date, 'en')}
+                </time>
+                <h3 class="mt-1.5 text-[15px] font-semibold leading-snug text-foreground line-clamp-3">
+                  {post.title}
+                </h3>
+              </div>
+            </a>
+          </article>
+        ))}
+      </div>
+
+      <!-- View all -->
+      <div class="mt-12 text-center" data-reveal="fade-up" data-reveal-delay="300">
+        <a
+          href={blogUrl}
+          class="inline-flex items-center gap-2 rounded-[3px] border border-primary/30 bg-primary/[5%] px-4 py-2.5 font-mono text-xs font-semibold uppercase tracking-[0.06em] text-primary transition-colors hover:bg-primary/[10%]"
+        >
+          <span data-t="articles.viewAll">View all articles</span>
+          <Icon icon="lucide:arrow-right" className="size-4" client:load />
+        </a>
+      </div>
+    </div>
+  </section>
+)}
+
+<style>
+  /* Show the thumbnail variant matching the active theme (class-based, not media query) */
+  .thumb-dark {
+    display: none;
+  }
+  :global(html.dark) .thumb-light {
+    display: none;
+  }
+  :global(html.dark) .thumb-dark {
+    display: block;
+  }
+</style>

@@ -1,0 +1,100 @@
+---
+import { Icon } from "@iconify/react";
+
+const pillars = [
+  {
+    icon: "lucide:shield-check",
+    titleKey: "pillars.card1.title",
+    descKey: "pillars.card1.description",
+    title: "Identity & Architecture",
+    description: "I design systems at the domain level: service boundaries, API contracts, and data ownership, before I touch a framework. My IAM expertise (OIDC, policies, multi-tenancy) comes from building FerrisKey, an identity platform where correctness isn't optional.",
+    proofLabel: "FerrisKey",
+    proofHref: "#ferriskey",
+    internal: true,
+  },
+  {
+    icon: "lucide:network",
+    titleKey: "pillars.card2.title",
+    descKey: "pillars.card2.description",
+    title: "Distributed Systems",
+    description: "I build services that coordinate reliably at scale: event-driven architectures, Kubernetes orchestration, and consistency models designed for failure, not just for the happy path.",
+    proofLabel: "FerrisKV",
+    proofHref: "https://github.com/ferrislabs/ferriskv",
+    internal: false,
+  },
+  {
+    icon: "lucide:activity",
+    titleKey: "pillars.card3.title",
+    descKey: "pillars.card3.description",
+    title: "Production Lifecycle",
+    description: "I don't stop at the deploy. CI/CD pipelines, structured observability with Prometheus and Loki, and the mindset of an owner, not a contractor. If it pages at 3am, I'm the one who fixed the design that caused it.",
+    proofLabel: "Mestier",
+    proofHref: "https://github.com/ferrislabs/mestier",
+    internal: false,
+  },
+];
+---
+
+<section id="experience" class="relative py-24 sm:py-32">
+  <div class="max-w-6xl mx-auto px-6">
+
+    <!-- Header: left-aligned -->
+    <div class="mb-12" data-reveal="fade-up">
+      <p class="text-sm font-semibold text-primary uppercase tracking-widest mb-3" data-t="pillars.label">
+        What I Do
+      </p>
+      <h2 class="text-3xl font-bold text-foreground sm:text-4xl" data-t="pillars.title">
+        Three things I'm built for
+      </h2>
+      <p class="mt-4 text-lg text-muted-foreground max-w-2xl" data-t="pillars.description">
+        Not a list of frameworks. What I actually deliver, end to end: get the system design right, make it work at scale, and keep it running in production.
+      </p>
+    </div>
+
+    <!-- Datasheet: numbered connected rows -->
+    <div class="overflow-hidden rounded-[4px] border border-border" data-reveal="fade-up" data-reveal-delay="80">
+      {pillars.map((p, i) => (
+        <div class="group grid grid-cols-1 items-start gap-4 border-b border-border p-6 transition-colors duration-300 last:border-b-0 hover:bg-primary/[3%] sm:grid-cols-[72px_1fr_auto] sm:gap-8 sm:p-7">
+          <!-- Index -->
+          <div class="flex items-center sm:items-start">
+            <span class="select-none font-mono text-4xl font-bold leading-none text-foreground/[12%] transition-colors duration-300 group-hover:text-primary/45">
+              {String(i + 1).padStart(2, "0")}
+            </span>
+          </div>
+
+          <!-- Content: icon left of the title, description aligned under the title -->
+          <div class="min-w-0">
+            <div class="flex items-center gap-3">
+              <span class="flex size-8 shrink-0 items-center justify-center rounded-[3px] bg-primary/10 text-primary transition-colors duration-300 group-hover:bg-primary/15">
+                <Icon icon={p.icon} className="size-4" client:load />
+              </span>
+              <h3 class="text-lg font-semibold text-foreground" data-t={p.titleKey}>
+                {p.title}
+              </h3>
+            </div>
+            <p class="mt-2.5 max-w-2xl pl-11 text-sm leading-relaxed text-muted-foreground" data-t={p.descKey}>
+              {p.description}
+            </p>
+          </div>
+
+          <!-- Proof link -->
+          <div class="flex shrink-0 sm:justify-end">
+            <a
+              href={p.proofHref}
+              target={p.internal ? undefined : "_blank"}
+              rel={p.internal ? undefined : "noopener noreferrer"}
+              class="inline-flex items-center gap-2 rounded-[3px] border border-primary/25 bg-primary/[6%] px-3 py-1.5 font-mono text-[11px] font-semibold uppercase tracking-[0.05em] text-primary transition-all duration-200 hover:border-primary/50 hover:bg-primary/[10%]"
+            >
+              {p.proofLabel}
+              <Icon
+                icon={p.internal ? "lucide:arrow-down" : "lucide:arrow-up-right"}
+                className="size-3 shrink-0"
+                client:load
+              />
+            </a>
+          </div>
+        </div>
+      ))}
+    </div>
+  </div>
+</section>
